@@ -6,4 +6,5 @@ Since the introduction of the so-called Dice loss function in 2016 by Miletari e
 
 
 [[1](https://arxiv.org/abs/1606.04797)] Fausto Milletari, Nassir Navab, Seyed-Ahmad Ahmadi, "**V-Net: Fully Convolutional Neural Networks for Volumetric Medical Image Segmentation**" *International Conference on 3D Imaging, Modeling, Processing, Visualization and Transmission (3DIMPVT)*, 2016.
-[2](https://link.springer.com/chapter/10.1007/978-3-319-67558-9_28) Carole H. Sudre, Wenqi Li, Tom Vercauteren, Sebastien Ourselin, M. Jorge Cardoso, "**Generalised Dice Overlap as a Deep Learning Loss Function for Highly Unbalanced Segmentations**" *International Workshop on Deep Learning in Medical Image Analysis (DLMIA) - MICCAI*, 2017.
+
+[[2](https://link.springer.com/chapter/10.1007/978-3-319-67558-9_28)] Carole H. Sudre, Wenqi Li, Tom Vercauteren, Sebastien Ourselin, M. Jorge Cardoso, "**Generalised Dice Overlap as a Deep Learning Loss Function for Highly Unbalanced Segmentations**" *International Workshop on Deep Learning in Medical Image Analysis (DLMIA) - MICCAI*, 2017.

@@ -261,7 +261,8 @@ class BaseModel(nn.Module):
             if log_file is not None:
                 log_file.writerow(
                     [
-                        'Epoch {:03d}', '{:7.4f}'.format(loss_tr),
+                        'Epoch {:03d}'.format(self.epoch),
+                        '{:7.4f}'.format(loss_tr),
                         '{:7.4f}'.format(loss_val)
                     ] + mid_tr.tolist() + mid_val.tolist() + mid_tst.tolist() +
                     [t_s]

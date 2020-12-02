@@ -244,10 +244,7 @@ def cross_val(
         ini_test = n_patients * i // n_folds
         end_test = n_patients * (i + 1) // n_folds
         training = patient_dicts[end_test:] + patient_dicts[:ini_test]
-        testing = [
-            (p, t) for p in patient_dicts[ini_test:end_test]
-            for t in p['t']
-        ]
+        testing = patient_dicts[ini_test:end_test]
 
         net = SimpleUNet(n_images=n_images)
 

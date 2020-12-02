@@ -194,9 +194,8 @@ class BaseModel(nn.Module):
         # We'll just take the maximum losses and accuracies (inf, -inf)
         # and print the headers.
         print('\033[K', end='')
-        whites = ' '.join([''] * 0)
-        print('{:}Epoch num |  {:}  |'.format(whites, l_hdr))
-        print('{:}----------|--{:}--|'.format(whites, l_bars))
+        print('Epoch num |  {:}  |'.format(l_hdr))
+        print('----------|--{:}--|'.format(l_bars))
         best_loss_tr = [np.inf] * len(self.val_functions)
         best_loss_val = [np.inf] * len(self.val_functions)
         best_loss_tst = [np.inf] * len(self.val_functions)
@@ -261,7 +260,7 @@ class BaseModel(nn.Module):
 
             if verbose:
                 print('\033[K', end='')
-                final_s = whites + ' | '.join(
+                final_s = ' | '.join(
                     [epoch_s, tr_loss_s, loss_s] +
                     losses_val_s + losses_tst_s +
                     [t_s]
@@ -343,7 +342,6 @@ class BaseModel(nn.Module):
         :return: None.
         """
         init_c = '\033[0m' if self.training else '\033[38;5;238m'
-        whites = ' '.join([''] * 12)
         percent = 20 * (batch_i + 1) // n_batches
         progress_s = ''.join(['-'] * percent)
         remainder_s = ''.join([' '] * (20 - percent))
@@ -360,7 +358,7 @@ class BaseModel(nn.Module):
         epoch_hdr = '{:}Epoch {:03} ({:03d}/{:03d}) [{:}>{:}] '
         loss_s = '{:} {:f} ({:f}) {:} / ETA {:}'
         batch_s = (epoch_hdr + loss_s).format(
-            init_c + whites, self.epoch, batch_i + 1, n_batches,
+            init_c, self.epoch, batch_i + 1, n_batches,
             progress_s, remainder_s,
             loss_name, b_loss, mean_loss, time_s, eta_s + '\033[0m'
         )
@@ -829,7 +827,6 @@ class SimpleUNet(BaseModel):
 
     def print_batch(self, patch_j, n_patches, i, n_cases, t_in, t_case_in):
         init_c = '\033[38;5;238m'
-        whites = ' '.join([''] * 12)
         percent = 20 * (patch_j + 1) // n_patches
         progress_s = ''.join(['-'] * percent)
         remainder_s = ''.join([' '] * (20 - percent))
@@ -843,7 +840,7 @@ class SimpleUNet(BaseModel):
         pre_s = '{:}Case {:03}/{:03} ({:03d}/{:03d}) [{:}>{:}]' \
                 ' {:} ETA: {:}'
         batch_s = pre_s.format(
-            init_c + whites, i + 1, n_cases, patch_j + 1, n_patches,
+            init_c, i + 1, n_cases, patch_j + 1, n_patches,
             progress_s, remainder_s, time_s, eta_s + '\033[0m'
         )
         print('\033[K', end='', flush=True)

@@ -265,8 +265,8 @@ def cross_val(
 
 def main(verbose=2):
     # Init
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
+    # torch.backends.cudnn.deterministic = True
+    # torch.backends.cudnn.benchmark = False
 
     c = color_codes()
     options = parse_inputs()

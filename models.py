@@ -220,7 +220,7 @@ class BaseModel(nn.Module):
                 tr_loss_s = '{:7.4f}'.format(loss_tr)
 
             # Then we validate and check all the losses
-            _, _, _, mid_tr = self.validate(
+            _, best_loss_tr, _, mid_tr = self.validate(
                 train_loader, best_loss_tr
             )
 

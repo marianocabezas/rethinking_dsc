@@ -294,7 +294,7 @@ def main(verbose=2):
                 print(
                     '{:}[{:}] {:}Starting cross-validation {:d}'
                     'seed {:d} {:}({:}){:}'.format(
-                        c['c'], strftime("%H:%M:%S"), c['g'], test_n, c['nc'],
+                        c['c'], strftime("%H:%M:%S"), c['g'], test_n,
                         seed, c['y'], loss, c['nc']
                     )
                 )

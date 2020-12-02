@@ -292,8 +292,10 @@ def main(verbose=2):
         for test_n, seed in enumerate(seeds):
             for loss in ['xent', 'gdsc', 'dsc', 'focal']:
                 print(
-                    '{:}[{:}] {:}Starting cross-validation {:d}{:}'.format(
-                        c['c'], strftime("%H:%M:%S"), c['g'], test_n, c['nc']
+                    '{:}[{:}] {:}Starting cross-validation {:d}'
+                    'seed {:d} {:}({:}){:}'.format(
+                        c['c'], strftime("%H:%M:%S"), c['g'], test_n, c['nc'],
+                        seed, c['y'], loss, c['nc']
                     )
                 )
                 cross_val(

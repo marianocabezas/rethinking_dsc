@@ -5,14 +5,11 @@ import os
 import re
 from time import strftime
 import numpy as np
-from skimage.measure import label as bwlabeln
-import nibabel as nib
-from nibabel import load as load_nii
 import torch
 from torch.utils.data import DataLoader
-from .utils import color_codes, get_dirs, get_int
-from .utils import get_mask, get_normalised_image
-from .utils import time_to_string, get_bb, find_file
+from utils import color_codes, get_dirs, get_int
+from utils import get_mask, get_normalised_image
+from utils import time_to_string, find_file
 from models import SimpleUNet
 from datasets import LesionCroppingDataset, LesionDataset
 

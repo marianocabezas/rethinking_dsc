@@ -6,9 +6,9 @@ import numpy as np
 import torch
 from torch import nn
 import torch.nn.functional as F
-from .utils import time_to_string, to_torch_var
-from .criterions import dsc_binary_loss, tp_binary_loss, tn_binary_loss
-from .criterions import focal_loss, gendsc_loss
+from utils import time_to_string, to_torch_var
+from criterions import dsc_binary_loss, tp_binary_loss, tn_binary_loss
+from criterions import focal_loss, gendsc_loss
 
 
 def norm_f(n_f):

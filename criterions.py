@@ -22,9 +22,27 @@ def focal_loss(pred, target, alpha=0.2, gamma=2.0):
     :param gamma: Focusing parameter (default 2.0).
     :return: Focal loss value.
     """
-    pt = target.type_as(pred) * pred + (1 - target).type_as(pred) * (1 - pred)
+
+    m_bg = target == 0
+    m_fg = target > 0
+
+    alpha_fg = alpha
+    alpha_bg = 1 - alpha
+    pt_fg = pred[m_fg]
+    pt_bg = (1 - pred[m_fg])
+
     bce = F.binary_cross_entropy(pred, target, reduction='none')
-    focal = alpha * (1 - pt).pow(gamma) * bce
+    bce_fg = bce[m_fg]
+    bce_bg = bce[m_bg]
+
+    focal_fg = alpha_fg * (1 - pt_fg).pow(gamma) * bce_fg
+    focal_bg = alpha_bg * (1 - pt_bg).pow(gamma) * bce_bg
+
+    focal = torch.cat([focal_fg, focal_bg])
+
+    # pt = target.type_as(pred) * pred + (1 - target).type_as(pred) * (1 - pred)
+    # bce = F.binary_cross_entropy(pred, target, reduction='none')
+    # focal = alpha * (1 - pt).pow(gamma) * bce
     return focal.mean()
 
 

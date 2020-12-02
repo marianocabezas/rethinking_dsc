@@ -644,6 +644,9 @@ class SimpleUNet(BaseModel):
             'gdsc': gendsc_loss,
             'dsc': partial(gendsc_loss, w_bg=0, w_fg=1),
             'focal': lambda x, y: focal_loss(
+                x, y.type_as(x).to(x.device), alpha=0
+            ),
+            'focal_w': lambda x, y: focal_loss(
                 x, y.type_as(x).to(x.device)
             ),
         }

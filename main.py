@@ -32,6 +32,7 @@ def parse_inputs():
         dest='data_dir', default=[
             '/home/mariano/data/DiceProject/longitudinal',
             '/home/mariano/data/DiceProject/wmh',
+            '/home/mariano/data/DiceProject/msseg',
             '/home/mariano/data/DiceProject/cross-sectional',
         ],
         help='Option to define the folders for each ask with all the patients.'
@@ -77,7 +78,7 @@ def get_images(d_path, image_tags=None, verbose=0):
     """
     c = color_codes()
     if image_tags is None:
-        image_tags = ['t1', 'flair']
+        image_tags = ['t1', 'flair', 'pd']
     tag_string = '(' + '|'.join(image_tags) + ')'
     patients = sorted(get_dirs(d_path), key=get_int)
     patient_dicts = []

@@ -174,9 +174,6 @@ class BaseModel(nn.Module):
         # Init
         best_e = 0
         l_names = ['train', ' val '] + [
-            '{:^6s}'.format('tr_' + l_f['name'][:3])
-            for l_f in self.val_functions
-        ] + [
             '{:^6s}'.format('vl_' + l_f['name'][:3])
             for l_f in self.val_functions
         ] + [
@@ -185,7 +182,7 @@ class BaseModel(nn.Module):
         ]
         l_bars = '--|--'.join(
             ['-' * 5] * 2 +
-            ['-' * 6] * (3 * len(l_names[2:])) +
+            ['-' * 6] * (2 * len(l_names[2:])) +
             ['-' * 3]
         )
         l_hdr = '  |  '.join(l_names)
@@ -233,7 +230,7 @@ class BaseModel(nn.Module):
                 tr_loss_s = '{:7.4f}'.format(loss_tr)
 
             # Then we validate and check all the losses
-            _, best_loss_tr, losses_tr_s, mid_tr = self.validate(
+            _, _, _, mid_tr = self.validate(
                 train_loader, best_loss_tr
             )
 
@@ -268,7 +265,7 @@ class BaseModel(nn.Module):
                 whites = ' '.join([''] * 12)
                 final_s = whites + ' | '.join(
                     [epoch_s, tr_loss_s, loss_s] +
-                    losses_tr_s + losses_val_s + losses_tst_s +
+                    losses_val_s + losses_tst_s +
                     [t_s]
                 )
                 print(final_s)

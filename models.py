@@ -167,14 +167,12 @@ class BaseModel(nn.Module):
             train_loader,
             val_loader,
             test_loader,
-            epochs=50,
-            patience=5,
+            epochs=100,
             log_file=None,
             verbose=True
     ):
         # Init
         best_e = 0
-        no_improv_e = 0
         l_names = ['train', ' val '] + [
             '{:^6s}'.format('tr_' + l_f['name'][:3])
             for l_f in self.val_functions
@@ -206,6 +204,20 @@ class BaseModel(nn.Module):
         best_loss_tr = [np.inf] * len(self.val_functions)
         best_loss_val = [np.inf] * len(self.val_functions)
         best_loss_tst = [np.inf] * len(self.val_functions)
+
+        if log_file is not None:
+            log_file.writerow(
+                ['Epoch', 'train', 'val'] + [
+                    'train_' + l_f['name']
+                    for l_f in self.val_functions
+                ] + [
+                    'val_' + l_f['name']
+                    for l_f in self.val_functions
+                ] + [
+                    'test_' + l_f['name']
+                    for l_f in self.val_functions
+                ] + ['time']
+            )
 
         for self.epoch in range(epochs):
             # Main epoch loop
@@ -724,7 +736,7 @@ class SimpleUNet(BaseModel):
         # <Optimizer setup>
         # We do this last step after all parameters are defined
         model_params = filter(lambda p: p.requires_grad, self.parameters())
-        self.optimizer_alg = torch.optim.Adam(model_params, lr=1e-4)
+        self.optimizer_alg = torch.optim.Adam(model_params, lr=1e-5)
         if verbose > 1:
             print(
                 'Network created on device {:} with training losses '

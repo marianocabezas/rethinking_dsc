@@ -1,4 +1,4 @@
-# Rethinking the Dice loss for unbalanced datasets using 3D patches
+# Rethinking the loss function for extremely unbalanced datasets using 3D patches
 
 Project to test some toy examples on the DSC loss for highly unbalanced datasets.
 

@@ -159,10 +159,10 @@ def train(
 
         # Here we'll do the training / validation split...
         d_train = d_val = [t['images'] for t in train_dicts]
-        r_train = r_val = [t['roi'] for t in train_dicts]
+        r_train = r_val = [t['lesion'] for t in train_dicts]
         m_train = m_val = [t['mask'] for t in train_dicts]
         d_test = [t['images'] for t in test_dicts]
-        r_test = [t['roi'] for t in test_dicts]
+        r_test = [t['lesion'] for t in test_dicts]
         m_test = [t['mask'] for t in test_dicts]
 
         # Training
@@ -234,7 +234,7 @@ def cross_val(
 
     for i in range(n_folds):
         print(
-            '{:}Starting fold {:} {:}({:}){:}'.format(
+            '{:}Starting fold {:} {:}({:}) {:}'.format(
                 c['c'], c['g'] + str(i) + c['nc'],
                 c['y'], loss, c['nc'] + d_path
             )
@@ -292,7 +292,7 @@ def main(verbose=2):
         for test_n, seed in enumerate(seeds):
             for loss in ['xent', 'gdsc', 'dsc', 'focal']:
                 print(
-                    '{:}[{:}] {:}Starting cross-validation {:d}'
+                    '{:}[{:}] {:}Starting cross-validation {:d} - '
                     'seed {:d} {:}({:}){:}'.format(
                         c['c'], strftime("%H:%M:%S"), c['g'], test_n,
                         seed, c['y'], loss, c['nc']

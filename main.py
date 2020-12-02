@@ -241,7 +241,7 @@ def cross_val(
         training = patient_dicts[end_test:] + patient_dicts[:ini_test]
         testing = patient_dicts[ini_test:end_test]
 
-        net = SimpleUNet(n_images=n_images)
+        net = SimpleUNet(n_images=n_images, base_loss=loss)
 
         model_name = 'unet-{:}.s{:d}.n{:d}.pt'.format(
             loss, seed, i

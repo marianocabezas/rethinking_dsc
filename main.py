@@ -26,8 +26,8 @@ def parse_inputs():
     parser.add_argument(
         '-d', '--data-directory',
         dest='data_dir', default=[
-            '/home/mariano/data/DiceProject/cross-sectional',
-            '/home/mariano/data/DiceProject/longitudinal'
+            '/home/mariano/data/DiceProject/longitudinal',
+            '/home/mariano/data/DiceProject/cross-sectional'
         ],
         help='Option to define the folders for each ask with all the patients.'
     )

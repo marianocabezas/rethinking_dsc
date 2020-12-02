@@ -182,7 +182,7 @@ class BaseModel(nn.Module):
         ]
         l_bars = '--|--'.join(
             ['-' * 5] * 2 +
-            ['-' * 6] * (2 * len(l_names[2:])) +
+            ['-' * 6] * len(l_names[2:])
         )
         l_hdr = '  |  '.join(l_names)
         # Since we haven't trained the network yet, we'll assume that the

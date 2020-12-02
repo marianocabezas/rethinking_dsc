@@ -108,7 +108,7 @@ def get_images(d_path, image_tags=None, verbose=0):
             'name': p,
             'brain': brain,
             'lesion': lesion,
-            'images': np.concatenate(images, axis=0),
+            'images': np.stack(images, axis=0),
         }
         patient_dicts.append(p_dict)
 

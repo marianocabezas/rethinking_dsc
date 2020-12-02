@@ -195,7 +195,7 @@ class BaseModel(nn.Module):
         # We'll just take the maximum losses and accuracies (inf, -inf)
         # and print the headers.
         print('\033[K', end='')
-        whites = ' '.join([''] * 12)
+        whites = ' '.join([''] * 0)
         print('{:}Epoch num |  {:}  |'.format(whites, l_hdr))
         print('{:}----------|--{:}--|'.format(whites, l_bars))
         best_loss_tr = [np.inf] * len(self.val_functions)
@@ -262,7 +262,6 @@ class BaseModel(nn.Module):
 
             if verbose:
                 print('\033[K', end='')
-                whites = ' '.join([''] * 12)
                 final_s = whites + ' | '.join(
                     [epoch_s, tr_loss_s, loss_s] +
                     losses_val_s + losses_tst_s +

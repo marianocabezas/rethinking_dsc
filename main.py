@@ -286,7 +286,7 @@ def main(verbose=2):
 
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
-            for loss in ['xent', 'gdsc', 'dsc', 'focal']:
+            for loss in ['xent', 'gdsc', 'dsc', 'focal', 'focal_w']:
                 print(
                     '{:}[{:}] {:}Starting cross-validation {:d} - '
                     'seed {:d} {:}({:}){:}'.format(

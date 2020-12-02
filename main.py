@@ -146,7 +146,6 @@ def train(
     c = color_codes()
     options = parse_inputs()
     epochs = options['epochs']
-    patience = options['patience']
     batch_size = options['batch_size']
     patch_size = options['patch_size']
     overlap = patch_size // 2
@@ -215,7 +214,7 @@ def train(
 
         net.fit(
             train_loader, val_loader, test_loader, epochs=epochs,
-            patience=patience, log_file=log_file
+            log_file=log_file
         )
         net.save_model(os.path.join(d_path, model_name))
 

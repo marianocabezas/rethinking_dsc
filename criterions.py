@@ -79,7 +79,7 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
                 else:
                     w_fg = 0
 
-            sum_pred_fg = torch.sum(pred[m_fg])
+            sum_pred_fg = torch.sum(y_hat[m_fg])
             sum_pred = torch.sum(y_hat)
 
             tp_term = (w_fg + w_bg) * sum_pred_fg

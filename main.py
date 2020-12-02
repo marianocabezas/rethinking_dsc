@@ -97,7 +97,7 @@ def get_images(d_path, image_tags=None, verbose=0):
 
         find_file('(' + '|'.join(image_tags) + ')', p_path)
         files = [
-            os.path.join(d_path, file) for file in os.listdir(p_path)
+            os.path.join(p_path, file) for file in os.listdir(p_path)
             if not os.path.isdir(file) and re.search(tag_string, file)
         ]
         brain = get_mask(os.path.join(p_path, 'brain.nii.gz'))

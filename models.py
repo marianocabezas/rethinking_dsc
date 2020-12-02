@@ -710,21 +710,9 @@ class SimpleUNet(BaseModel):
                 'f': lambda p, t: gendsc_loss(p, t)
             },
             {
-                'name': 'dsc',
-                'weight': 0,
-                'f': lambda p, t: gendsc_loss(p, t, w_bg=0, w_fg=1)
-            },
-            {
                 'name': 'xent',
                 'weight': 0,
                 'f': lambda p, t: F.binary_cross_entropy(
-                    p, t.type_as(p).to(p.device)
-                )
-            },
-            {
-                'name': 'focal',
-                'weight': 0,
-                'f': lambda p, t: focal_loss(
                     p, t.type_as(p).to(p.device)
                 )
             },

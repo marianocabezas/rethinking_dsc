@@ -168,6 +168,7 @@ class LesionCroppingDataset(Dataset):
         case = self.cases[case_idx]
         none_slice = (slice(None, None),)
         # Patch "extraction".
+        print(case.shape)
         data = case[none_slice + slice_i].astype(np.float32)
         labels = self.labels[case_idx].astype(np.uint8)
 

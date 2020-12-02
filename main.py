@@ -102,10 +102,7 @@ def get_images(d_path, image_tags=None, verbose=0):
         ]
         brain = get_mask(os.path.join(p_path, 'brain.nii.gz'))
         lesion = get_mask(os.path.join(p_path, 'lesion.nii.gz'))
-        images = [
-            get_normalised_image(file, brain, dtype=np.float16)
-            for file in files
-        ]
+        images = [get_normalised_image(file, brain) for file in files]
         n_images = len(images)
         p_dict = {
             'name': p,

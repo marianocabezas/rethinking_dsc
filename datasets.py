@@ -200,8 +200,6 @@ class LesionDataset(Dataset):
             cases, labels, masks
     ):
         # Init
-        data_shape = masks[0].shape
-
         self.masks = masks
         self.labels = labels
         self.cases = cases

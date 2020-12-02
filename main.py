@@ -110,7 +110,7 @@ def get_images(d_path, image_tags=None, verbose=0):
         p_dict = {
             'name': p,
             'brain': brain,
-            'mask': lesion,
+            'lesion': lesion,
             'images': np.concatenate(images, axis=0),
         }
         patient_dicts.append(p_dict)
@@ -159,11 +159,11 @@ def train(
 
         # Here we'll do the training / validation split...
         d_train = d_val = [t['images'] for t in train_dicts]
-        r_train = r_val = [t['lesion'] for t in train_dicts]
-        m_train = m_val = [t['mask'] for t in train_dicts]
+        r_train = r_val = [t['brain'] for t in train_dicts]
+        m_train = m_val = [t['lesion'] for t in train_dicts]
         d_test = [t['images'] for t in test_dicts]
-        r_test = [t['lesion'] for t in test_dicts]
-        m_test = [t['mask'] for t in test_dicts]
+        r_test = [t['brain'] for t in test_dicts]
+        m_test = [t['lesion'] for t in test_dicts]
 
         # Training
         if verbose > 1:

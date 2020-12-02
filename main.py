@@ -78,7 +78,7 @@ def get_images(d_path, image_tags=None, verbose=0):
     """
     c = color_codes()
     if image_tags is None:
-        image_tags = ['t1', 'flair', 'pd']
+        image_tags = ['t1', 'flair', 'pd', 't2']
     tag_string = '(' + '|'.join(image_tags) + ')'
     patients = sorted(get_dirs(d_path), key=get_int)
     patient_dicts = []

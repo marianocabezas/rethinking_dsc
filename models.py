@@ -127,7 +127,7 @@ class BaseModel(nn.Module):
                     l_f['weight'] * l
                     for l_f, l in zip(self.val_functions, batch_losses)
                 ])
-                mid_losses.append([l.tolist() for l in batch_losses])
+                mid_losses.append([loss.tolist() for loss in batch_losses])
 
             # It's important to compute the global loss in both cases.
             loss_value = batch_loss.tolist()
@@ -263,7 +263,8 @@ class BaseModel(nn.Module):
                     [
                         'Epoch {:03d}', '{:7.4f}'.format(loss_tr),
                         '{:7.4f}'.format(loss_val)
-                    ] + mid_tr + mid_val + mid_tst + [t_s]
+                    ] + mid_tr.tolist() + mid_val.tolist() + mid_tst.tolist() +
+                    [t_s]
                 )
 
             self.epoch_update(epochs)

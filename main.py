@@ -19,8 +19,11 @@ from datasets import LesionCroppingDataset, LesionDataset
 
 
 def parse_inputs():
-    # I decided to separate this function, for easier acces to the command line parameters
-    parser = argparse.ArgumentParser(description='Test different nets with 3D data.')
+    # I decided to separate this function, for easier acces to the command line
+    # parameters
+    parser = argparse.ArgumentParser(
+        description='Test different nets with 3D data.'
+    )
 
     # Mode selector
     parser.add_argument(
@@ -147,73 +150,69 @@ def train(
     patch_size = options['patch_size']
     overlap = patch_size // 2
 
-    try:
-        net.load_model(os.path.join(d_path, model_name))
-    except IOError:
+    if verbose > 1:
+        print('Preparing the training datasets / dataloaders')
 
-        if verbose > 1:
-            print('Preparing the training datasets / dataloaders')
+    # Here we'll do the training / validation split...
+    d_train = d_val = [t['images'] for t in train_dicts]
+    r_train = r_val = [t['brain'] for t in train_dicts]
+    m_train = m_val = [t['lesion'] for t in train_dicts]
+    d_test = [t['images'] for t in test_dicts]
+    r_test = [t['brain'] for t in test_dicts]
+    m_test = [t['lesion'] for t in test_dicts]
 
-        # Here we'll do the training / validation split...
-        d_train = d_val = [t['images'] for t in train_dicts]
-        r_train = r_val = [t['brain'] for t in train_dicts]
-        m_train = m_val = [t['lesion'] for t in train_dicts]
-        d_test = [t['images'] for t in test_dicts]
-        r_test = [t['brain'] for t in test_dicts]
-        m_test = [t['lesion'] for t in test_dicts]
+    # Training
+    if verbose > 1:
+        print('< Training dataset >')
+    train_dataset = LesionCroppingDataset(
+        d_train, m_train, r_train, patch_size=patch_size,
+        overlap=overlap, negative_ratio=negative_ratio
+    )
 
-        # Training
-        if verbose > 1:
-            print('< Training dataset >')
-        train_dataset = LesionCroppingDataset(
-            d_train, m_train, r_train, patch_size=patch_size,
-            overlap=overlap, negative_ratio=negative_ratio
+    if verbose > 1:
+        print('Dataloader creation <with validation>')
+    train_loader = DataLoader(train_dataset, batch_size, True)
+
+    # Validation
+    if verbose > 1:
+        print('< Validation dataset >')
+    val_dataset = LesionDataset(d_val, m_val, r_val)
+    if verbose > 1:
+        print('Dataloader creation <val>')
+    val_loader = DataLoader(val_dataset, 1)
+
+    # Test
+    if verbose > 1:
+        print('< Test dataset >')
+    test_dataset = LesionDataset(d_test, m_test, r_test)
+    if verbose > 1:
+        print('Dataloader creation <val>')
+    test_loader = DataLoader(test_dataset, 1)
+
+    if verbose > 1:
+        print(
+            'Training / validation / test samples = '
+            '{:d} / {:d} / {:d}'.format(
+                len(train_dataset), len(val_dataset), len(test_dataset)
+            )
+        )
+    if verbose > 0:
+        n_param = sum(
+            p.numel() for p in net.parameters()
+            if p.requires_grad
+        )
+        print(
+            '{:}Starting training with a {:}simple Unet{:} '
+            '({:}{:d}{:} parameters)'.format(
+                c['c'], c['g'], c['nc'], c['b'], n_param, c['nc']
+            )
         )
 
-        if verbose > 1:
-            print('Dataloader creation <with validation>')
-        train_loader = DataLoader(train_dataset, batch_size, True)
-
-        # Validation
-        if verbose > 1:
-            print('< Validation dataset >')
-        val_dataset = LesionDataset(d_val, m_val, r_val)
-        if verbose > 1:
-            print('Dataloader creation <val>')
-        val_loader = DataLoader(val_dataset, 1)
-
-        # Test
-        if verbose > 1:
-            print('< Test dataset >')
-        test_dataset = LesionDataset(d_test, m_test, r_test)
-        if verbose > 1:
-            print('Dataloader creation <val>')
-        test_loader = DataLoader(test_dataset, 1)
-
-        if verbose > 1:
-            print(
-                'Training / validation / test samples = '
-                '{:d} / {:d} / {:d}'.format(
-                    len(train_dataset), len(val_dataset), len(test_dataset)
-                )
-            )
-        if verbose > 0:
-            n_param = sum(
-                p.numel() for p in net.parameters()
-                if p.requires_grad
-            )
-            print(
-                '{:}Starting training with a {:}simple Unet{:} '
-                '({:}{:d}{:} parameters)'.format(
-                    c['c'], c['g'], c['nc'], c['b'], n_param, c['nc']
-                )
-            )
-
-        net.fit(
-            train_loader, val_loader, test_loader, epochs=epochs,
-            log_file=log_file
-        )
-        net.save_model(os.path.join(d_path, model_name))
+    net.fit(
+        train_loader, val_loader, test_loader, epochs=epochs,
+        log_file=log_file
+    )
+    net.save_model(os.path.join(d_path, model_name))
 
 
 def cross_val(

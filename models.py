@@ -53,8 +53,6 @@ class BaseModel(nn.Module):
         self.val_functions = [
             {'name': 'val', 'weight': 1, 'f': None},
         ]
-        self.acc_functions = {}
-        self.acc = None
 
     def forward(self, *inputs):
         """
@@ -87,7 +85,6 @@ class BaseModel(nn.Module):
         """
         losses = list()
         mid_losses = list()
-        accs = list()
         n_batches = len(data)
         for batch_i, (x, y) in enumerate(data):
             # In case we are training the the gradient to zero.
@@ -128,12 +125,7 @@ class BaseModel(nn.Module):
                     l_f['weight'] * l
                     for l_f, l in zip(self.val_functions, batch_losses)
                 ])
-                mid_losses.append([l.tolist() for l in batch_losses])
-                batch_accs = [
-                    l_f['f'](pred_labels, y_cuda)
-                    for l_f in self.acc_functions
-                ]
-                accs.append([a.tolist() for a in batch_accs])
+                mid_losses.append([loss.tolist() for loss in batch_losses])
 
             # It's important to compute the global loss in both cases.
             loss_value = batch_loss.tolist()
@@ -152,15 +144,10 @@ class BaseModel(nn.Module):
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
 
-        if train:
-            return mean_loss
-        else:
-            # If using the validation data, we actually need to compute the
-            # mean of each different loss.
-            mean_losses = np.mean(list(zip(*mid_losses)), axis=1)
-            np_accs = np.array(list(zip(*accs)))
-            mean_accs = np.mean(np_accs, axis=1) if np_accs.size > 0 else []
-            return mean_loss, mean_losses, mean_accs
+        # If using the validation data, we actually need to compute the
+        # mean of each different loss.
+        mean_losses = np.mean(list(zip(*mid_losses)), axis=1)
+        return mean_loss, mean_losses
 
     def fit(
             self,

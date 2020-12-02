@@ -236,7 +236,7 @@ def cross_val(
         print(
             '{:}Starting fold {:} {:}({:}){:}'.format(
                 c['c'], c['g'] + str(i) + c['nc'],
-                c['y'], loss, c['nc']
+                c['y'], loss, c['nc'] + d_path
             )
         )
         # Training

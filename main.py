@@ -5,6 +5,7 @@ import os
 import re
 from time import strftime
 import numpy as np
+from nibabel import load as load_nii
 import torch
 from torch.utils.data import DataLoader
 from utils import color_codes, get_dirs, get_int
@@ -30,6 +31,7 @@ def parse_inputs():
         '-d', '--data-directory',
         dest='data_dir', default=[
             '/home/mariano/data/DiceProject/longitudinal',
+            '/home/mariano/data/DiceProject/wmh'
             '/home/mariano/data/DiceProject/cross-sectional'
         ],
         help='Option to define the folders for each ask with all the patients.'
@@ -104,7 +106,8 @@ def get_images(d_path, image_tags=None, verbose=0):
             if not os.path.isdir(file) and re.search(tag_string, file)
         ]
         brain = get_mask(os.path.join(p_path, 'brain.nii.gz'))
-        lesion = get_mask(os.path.join(p_path, 'lesion.nii.gz'))
+        lesion = load_nii(os.path.join(p_path, 'lesion.nii.gz')).get_fdata()
+        lesion = (lesion == 1).astype(np.uint8)
         images = [get_normalised_image(file, brain) for file in files]
         n_images = len(images)
         p_dict = {

@@ -70,12 +70,12 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
 
             if w_bg is None:
                 if n_bg > 0:
-                    w_bg = torch.sqrt(n_bg.astype(torch.float32)) ** -2
+                    w_bg = torch.sqrt(n_bg.type(torch.float32)) ** -2
                 else:
                     w_bg = 0
             if w_fg is None:
                 if n_fg > 0:
-                    w_fg = torch.sqrt(n_fg.astype(torch.float32)) ** -2
+                    w_fg = torch.sqrt(n_fg.type(torch.float32)) ** -2
                 else:
                     w_fg = 0
 

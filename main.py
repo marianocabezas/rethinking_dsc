@@ -159,15 +159,12 @@ def train(
             print('Preparing the training datasets / dataloaders')
 
         # Here we'll do the training / validation split...
-        train_data = [t for p in train_dicts for t in p['t']]
-        test_data = [t for p in test_dicts for t in p['t']]
-
-        d_train = d_val = [t['images'] for t in train_data]
-        r_train = r_val = [t['roi'] for t in train_data]
-        m_train = m_val = [t['mask'] for t in train_data]
-        d_test = [t['images'] for t in test_data]
-        r_test = [t['roi'] for t in test_data]
-        m_test = [t['mask'] for t in test_data]
+        d_train = d_val = [t['images'] for t in train_dicts]
+        r_train = r_val = [t['roi'] for t in train_dicts]
+        m_train = m_val = [t['mask'] for t in train_dicts]
+        d_test = [t['images'] for t in test_dicts]
+        r_test = [t['roi'] for t in test_dicts]
+        m_test = [t['mask'] for t in test_dicts]
 
         # Training
         if verbose > 1:

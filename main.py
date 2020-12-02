@@ -33,6 +33,7 @@ def parse_inputs():
             '/home/mariano/data/DiceProject/longitudinal',
             '/home/mariano/data/DiceProject/wmh',
             '/home/mariano/data/DiceProject/msseg',
+            '/home/mariano/data/DiceProject/lit',
             '/home/mariano/data/DiceProject/cross-sectional',
         ],
         help='Option to define the folders for each ask with all the patients.'

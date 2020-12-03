@@ -183,20 +183,14 @@ Binary losses (validation)
 
 
 def dsc_binary_loss(pred, target):
-    pred = (pred >= 0.5).to(pred.device)
-    target = target.type_as(pred).to(pred.device)
+    pred = torch.flatten(pred >= 0.5, start_dim=1).to(pred.device)
+    target = torch.flatten(target, start_dim=1).type_as(pred).to(pred.device)
 
-    dims = pred.shape
-    reduce_dims = tuple(range(1, len(dims)))
     intersection = (
-            2 * torch.sum(pred & target, dim=reduce_dims)
+            2 * torch.sum(pred & target, dim=1)
     ).type(torch.float32).to(pred.device)
-    sum_pred = torch.sum(
-        pred, dim=reduce_dims
-    ).type(torch.float32).to(pred.device)
-    sum_target = torch.sum(
-        target, dim=reduce_dims
-    ).type(torch.float32).to(pred.device)
+    sum_pred = torch.sum(pred, dim=1).type(torch.float32).to(pred.device)
+    sum_target = torch.sum(target, dim=1).type(torch.float32).to(pred.device)
 
     dsc_k = intersection / (sum_pred + sum_target)
     dsc_k[torch.isnan(dsc_k)] = 0
@@ -206,17 +200,13 @@ def dsc_binary_loss(pred, target):
 
 
 def tp_binary_loss(pred, target):
-    pred = (pred >= 0.5).to(pred.device)
-    target = target.type_as(pred).to(pred.device)
+    pred = torch.flatten(pred >= 0.5, start_dim=1).to(pred.device)
+    target = torch.flatten(target, start_dim=1).type_as(pred).to(pred.device)
 
-    dims = pred.shape
-    reduce_dims = tuple(range(1, len(dims)))
     intersection = (
-            torch.sum(pred & target, dim=reduce_dims)
+        torch.sum(pred & target, dim=1)
     ).type(torch.float32).to(pred.device)
-    sum_target = torch.sum(
-        target, dim=reduce_dims
-    ).type(torch.float32).to(pred.device)
+    sum_target = torch.sum(target, dim=1).type(torch.float32).to(pred.device)
 
     tp_k = intersection / sum_target
     tp_k[torch.isnan(tp_k)] = 0
@@ -226,17 +216,13 @@ def tp_binary_loss(pred, target):
 
 
 def tn_binary_loss(pred, target):
-    pred = (pred < 0.5).to(pred.device)
-    target = torch.logical_not(target.type_as(pred)).to(pred.device)
+    pred = torch.flatten(pred < 0.5, start_dim=1).to(pred.device)
+    target = torch.flatten(target, start_dim=1).type_as(pred).to(pred.device)
 
-    dims = pred.shape
-    reduce_dims = tuple(range(1, len(dims)))
     intersection = (
-            torch.sum(pred & target, dim=reduce_dims)
+            torch.sum(pred & target, dim=1)
     ).type(torch.float32).to(pred.device)
-    sum_target = torch.sum(
-        target, dim=reduce_dims
-    ).type(torch.float32).to(pred.device)
+    sum_target = torch.sum(target, dim=1).type(torch.float32).to(pred.device)
 
     tn_k = intersection / sum_target
     tn_k[torch.isnan(tn_k)] = 0

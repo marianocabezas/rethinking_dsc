@@ -229,7 +229,7 @@ def cross_val(
     c = color_codes()
 
     np.random.seed(seed)
-    cross_seeds = np.random.randint(0, 100, n_folds)
+    cross_seeds = np.random.randint(0, 10000, n_folds)
 
     patient_dicts, n_images = get_images(d_path)
 
@@ -296,7 +296,7 @@ def main(verbose=2):
     # A more elegant solution would be to create a "seed file", which is
     # instatiated on the first run and then it's checked if the script crashes.
     # Might do it "later".
-    seeds = [42, 80702, 74794, 62021, 48497, 14813, 125, 44786, 21278, 26685]
+    seeds = [42, 80702, 74794, 62021, 48497]
     losses = [
         'xent', 'gdsc', 'gdsc_b', 'dsc', 'focal', 'focal_w1', 'focal_w2'
     ]

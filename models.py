@@ -641,6 +641,9 @@ class SimpleUNet(BaseModel):
             'xent': lambda x, y: F.binary_cross_entropy(
                 x, y.type_as(x).to(x.device)
             ),
+            'xent_w': lambda x, y: focal_loss(
+                x, y.type_as(x).to(x.device), alpha=0.75, gamma=0
+            ),
             'gdsc': gendsc_loss,
             'dsc': partial(gendsc_loss, w_bg=0, w_fg=1),
             'focal': lambda x, y: focal_loss(

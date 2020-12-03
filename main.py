@@ -226,41 +226,48 @@ def cross_val(
     # Init
     c = color_codes()
 
-    torch.manual_seed(seed)
     np.random.seed(seed)
+    cross_seeds = np.random.randint(0, 100, n_folds)
 
     patient_dicts, n_images = get_images(d_path)
 
     n_patients = len(patient_dicts)
 
-    for i in range(n_folds):
+    for i, seed_i in enumerate(cross_seeds):
+        np.random.seed(seed_i)
+        torch.manual_seed(seed_i)
         print(
             '{:}Starting fold {:} {:}({:}) {:}'.format(
                 c['c'], c['g'] + str(i) + c['nc'],
                 c['y'], loss, c['nc'] + d_path
             )
         )
-        # Training
-        ini_test = n_patients * i // n_folds
-        end_test = n_patients * (i + 1) // n_folds
-        training = patient_dicts[end_test:] + patient_dicts[:ini_test]
-        testing = patient_dicts[ini_test:end_test]
-
-        net = SimpleUNet(n_images=n_images, base_loss=loss)
 
         model_name = 'unet-{:}.s{:d}.n{:d}.pt'.format(
             loss, seed, i
         )
-        csv_name = 'unet-{:}.s{:d}.n{:d}.csv'.format(
-            loss, seed, i
-        )
+        net = SimpleUNet(n_images=n_images, base_loss=loss)
 
-        with open(os.path.join(d_path, csv_name), 'w') as csvfile:
-            csvwriter = csv.writer(csvfile)
-            train(
-                d_path, net, model_name, training, testing,
-                log_file=csvwriter, verbose=verbose
+        try:
+            net.load_model(model_name)
+        except IOError:
+            # Training
+            ini_test = n_patients * i // n_folds
+            end_test = n_patients * (i + 1) // n_folds
+            training = patient_dicts[end_test:] + patient_dicts[:ini_test]
+            testing = patient_dicts[ini_test:end_test]
+
+
+            csv_name = 'unet-{:}.s{:d}.n{:d}.csv'.format(
+                loss, seed, i
             )
+
+            with open(os.path.join(d_path, csv_name), 'w') as csvfile:
+                csvwriter = csv.writer(csvfile)
+                train(
+                    d_path, net, model_name, training, testing,
+                    log_file=csvwriter, verbose=verbose
+                )
 
 
 """

@@ -303,7 +303,7 @@ def main(verbose=2):
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
             for loss in losses:
-                for nr in [0, 1]:
+                for nr in [0, 1, 2, 3]:
                     print(
                         '{:}[{:}] {:}Starting cross-validation {:d} - '
                         'seed {:d} {:}({:}){:}'.format(

@@ -41,7 +41,7 @@ def parse_inputs():
     parser.add_argument(
         '-e', '--epochs',
         dest='epochs',
-        type=int, default=100,
+        type=int, default=50,
         help='Number of epochs'
     )
     parser.add_argument(
@@ -51,7 +51,7 @@ def parse_inputs():
         help='Number of samples per batch'
     )
     parser.add_argument(
-        '-k', '--patch-size',
+        '-p', '--patch-size',
         dest='patch_size',
         type=int, default=32,
         help='Patch size'

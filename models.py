@@ -55,6 +55,8 @@ class BaseModel(nn.Module):
         ]
         self.acc_functions = {}
         self.acc = None
+        self.first_state = None
+        self.last_state = None
 
     def forward(self, *inputs):
         """
@@ -164,6 +166,7 @@ class BaseModel(nn.Module):
             verbose=True
     ):
         # Init
+        self.first_state = deepcopy(self.state_dict())
         best_e = 0
         l_names = ['train', ' val '] + [
             '{:^6s}'.format('vl_' + l_f['name'][:3])
@@ -270,6 +273,7 @@ class BaseModel(nn.Module):
 
             self.epoch_update(epochs)
 
+        self.last_state = deepcopy(self.state_dict())
         self.epoch = best_e
         self.load_state_dict(self.best_state)
         t_end = time.time() - t_start
@@ -377,6 +381,14 @@ class BaseModel(nn.Module):
 
     def save_model(self, net_name):
         torch.save(self.state_dict(), net_name)
+
+    def save_last(self, net_name):
+        if self.last_state is not None:
+            torch.save(self.last_state, net_name)
+
+    def save_first(self, net_name):
+        if self.first_state is not None:
+            torch.save(self.first_state, net_name)
 
     def load_model(self, net_name):
         self.load_state_dict(torch.load(net_name))

@@ -303,17 +303,18 @@ def main(verbose=2):
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
             for loss in losses:
-                print(
-                    '{:}[{:}] {:}Starting cross-validation {:d} - '
-                    'seed {:d} {:}({:}){:}'.format(
-                        c['c'], strftime("%H:%M:%S"), c['g'], test_n,
-                        seed, c['y'], loss, c['nc']
+                for nr in [0, 1]:
+                    print(
+                        '{:}[{:}] {:}Starting cross-validation {:d} - '
+                        'seed {:d} {:}({:}){:}'.format(
+                            c['c'], strftime("%H:%M:%S"), c['g'], test_n,
+                            seed, c['y'], loss, c['nc']
+                        )
                     )
-                )
-                cross_val(
-                    d_path, seed=seed, loss=loss, verbose=verbose,
-                    negative_ratio=0
-                )
+                    cross_val(
+                        d_path, seed=seed, loss=loss, verbose=verbose,
+                        negative_ratio=nr
+                    )
 
 
 if __name__ == '__main__':

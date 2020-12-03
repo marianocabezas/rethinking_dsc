@@ -646,8 +646,11 @@ class SimpleUNet(BaseModel):
             'focal': lambda x, y: focal_loss(
                 x, y.type_as(x).to(x.device), alpha=0
             ),
-            'focal_w': lambda x, y: focal_loss(
-                x, y.type_as(x).to(x.device)
+            'focal_w1': lambda x, y: focal_loss(
+                x, y.type_as(x).to(x.device), alpha=0.25
+            ),
+            'focal_w2': lambda x, y: focal_loss(
+                x, y.type_as(x).to(x.device), alpha=0.75
             ),
         }
         self.init = False

@@ -189,7 +189,7 @@ def dsc_binary_loss(pred, target):
     dims = pred.shape
     reduce_dims = tuple(range(1, len(dims)))
     intersection = (
-            2 * torch.sum(pred * target, dim=reduce_dims)
+            2 * torch.sum(pred & target, dim=reduce_dims)
     ).type(torch.float32).to(pred.device)
     sum_pred = torch.sum(
         pred, dim=reduce_dims
@@ -212,7 +212,7 @@ def tp_binary_loss(pred, target):
     dims = pred.shape
     reduce_dims = tuple(range(1, len(dims)))
     intersection = (
-            torch.sum(pred * target, dim=reduce_dims)
+            torch.sum(pred & target, dim=reduce_dims)
     ).type(torch.float32).to(pred.device)
     sum_target = torch.sum(
         target, dim=reduce_dims
@@ -232,7 +232,7 @@ def tn_binary_loss(pred, target):
     dims = pred.shape
     reduce_dims = tuple(range(1, len(dims)))
     intersection = (
-            torch.sum(pred * target, dim=reduce_dims)
+            torch.sum(pred & target, dim=reduce_dims)
     ).type(torch.float32).to(pred.device)
     sum_target = torch.sum(
         target, dim=reduce_dims

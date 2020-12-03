@@ -40,9 +40,6 @@ def focal_loss(pred, target, alpha=0.25, gamma=2.0):
 
     focal = torch.cat([focal_fg, focal_bg])
 
-    # pt = target.type_as(pred) * pred + (1 - target).type_as(pred) * (1 - pred)
-    # bce = F.binary_cross_entropy(pred, target, reduction='none')
-    # focal = alpha * (1 - pt).pow(gamma) * bce
     return focal.mean()
 
 
@@ -68,14 +65,6 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
     assert target.shape == pred.shape,\
         'Sizes between predicted and target do not match'
     target = target.type_as(pred)
-
-    # Mj = Labels of patch j / mij = Label of voxel i from patch j
-    # Aj = prediction of patch j / aij = Prediction of voxel i from patch j
-    # M0 = {i: mij = 0}
-    # M1 = {i: mij = 1}
-    # Ldsc = Ldsc(A, M)) =
-    # = sum(||M1|| + epsilon + sum^M0(ak0) - sum^M1(ak1)) /
-    # ||M1|| + epsilon + sum(ai)
 
     if batch:
         loss = []
@@ -220,7 +209,7 @@ def tn_binary_loss(pred, target):
     target = torch.flatten(target, start_dim=1).type_as(pred).to(pred.device)
 
     intersection = (
-            torch.sum(pred & target, dim=1)
+            torch.sum(pred & torch.logical_not(target), dim=1)
     ).type(torch.float32).to(pred.device)
     sum_target = torch.sum(target, dim=1).type(torch.float32).to(pred.device)
 

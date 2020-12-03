@@ -105,7 +105,7 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
             den = (w_fg - w_bg) * (n_fg + sum_pred) + 2 * n * w_bg
 
             loss.append(1 - 2 * (tp_term + tn_term) / den)
-        loss = torch.mean(torch.tensor(loss))
+        loss = torch.mean(torch.cat(loss))
     else:
         m_bg = target == 0
         m_fg = target > 0

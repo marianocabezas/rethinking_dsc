@@ -223,7 +223,7 @@ def train(
 
 
 def cross_val(
-        d_path, n_folds=5, seed=42, loss='xent', verbose=0
+        d_path, n_folds=5, seed=42, loss='xent', negative_ratio=1, verbose=0
 ):
     # Init
     c = color_codes()
@@ -259,15 +259,16 @@ def cross_val(
             training = patient_dicts[end_test:] + patient_dicts[:ini_test]
             testing = patient_dicts[ini_test:end_test]
 
-            csv_name = 'unet-{:}.s{:d}.n{:d}.csv'.format(
-                loss, seed, i
+            csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.csv'.format(
+                loss, negative_ratio, seed, i
             )
 
             with open(os.path.join(d_path, csv_name), 'w') as csvfile:
                 csvwriter = csv.writer(csvfile)
                 train(
                     d_path, net, model_name, training, testing,
-                    log_file=csvwriter, verbose=verbose
+                    negative_ratio=negative_ratio, log_file=csvwriter,
+                    verbose=verbose
                 )
 
 
@@ -310,7 +311,8 @@ def main(verbose=2):
                     )
                 )
                 cross_val(
-                    d_path, seed=seed, loss=loss, verbose=verbose
+                    d_path, seed=seed, loss=loss, verbose=verbose,
+                    negative_ratio=0
                 )
 
 

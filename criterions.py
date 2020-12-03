@@ -211,7 +211,9 @@ def tn_binary_loss(pred, target):
     intersection = (
             torch.sum(pred & torch.logical_not(target), dim=1)
     ).type(torch.float32).to(pred.device)
-    sum_target = torch.sum(target, dim=1).type(torch.float32).to(pred.device)
+    sum_target = torch.sum(
+        torch.logical_not(target), dim=1
+    ).type(torch.float32).to(pred.device)
 
     tn_k = intersection / sum_target
     tn_k[torch.isnan(tn_k)] = 0

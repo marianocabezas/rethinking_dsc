@@ -7,7 +7,7 @@ Probabilistic losses (training)
 """
 
 
-def focal_loss(pred, target, alpha=0.2, gamma=2.0):
+def focal_loss(pred, target, alpha=0.25, gamma=2.0):
     """
     Function to compute the focal loss based on:
     Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollár. "Focal

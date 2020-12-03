@@ -257,7 +257,6 @@ def cross_val(
             training = patient_dicts[end_test:] + patient_dicts[:ini_test]
             testing = patient_dicts[ini_test:end_test]
 
-
             csv_name = 'unet-{:}.s{:d}.n{:d}.csv'.format(
                 loss, seed, i
             )

@@ -294,12 +294,12 @@ def main(verbose=2):
     # instatiated on the first run and then it's checked if the script crashes.
     # Might do it "later".
     seeds = [42, 80702, 74794, 62021, 48497, 14813, 125, 44786, 21278, 26685]
-
+    losses = [
+        'xent', 'gdsc', 'gdsc_b', 'dsc', 'focal', 'focal_w1', 'focal_w2'
+    ]
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
-            for loss in [
-                'xent', 'gdsc', 'dsc', 'focal', 'focal_w1', 'focal_w2'
-            ]:
+            for loss in losses:
                 print(
                     '{:}[{:}] {:}Starting cross-validation {:d} - '
                     'seed {:d} {:}({:}){:}'.format(

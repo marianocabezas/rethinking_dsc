@@ -104,6 +104,9 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
             tn_term = w_bg * (n_bg - sum_pred)
             den = (w_fg - w_bg) * (n_fg + sum_pred) + 2 * n * w_bg
 
+            if w_bg == 0 and den == 0:
+                den = den + 1e-6
+
             loss.append(1 - 2 * (tp_term + tn_term) / den)
         loss = sum(loss) / len(loss)
     else:

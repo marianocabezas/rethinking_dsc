@@ -294,7 +294,7 @@ def main(verbose=2):
 
     # Random seeds. These are hard coded to avoid issues if the script crashes.
     # A more elegant solution would be to create a "seed file", which is
-    # instatiated on the first run and then it's checked if the script crashes.
+    # instantiated on the first run and then it's checked if the script end-s.
     # Might do it "later".
     seeds = [42, 80702, 74794, 62021, 48497]
     losses = [

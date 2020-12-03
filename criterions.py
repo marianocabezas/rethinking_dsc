@@ -136,6 +136,44 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
     return loss
 
 
+def new_loss(pred, target, weight_bg=None, weight_fg=None):
+    return PrincipledLoss.apply(pred, target, weight_bg, weight_fg)
+
+
+class PrincipledLoss(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx, pred, target, weight_bg=None, weight_fg=None):
+        m_bg = target == 0
+        m_fg = target > 0
+
+        if weight_bg is None:
+            weight_bg = float(torch.sum(m_fg)) / torch.numel(target)
+        if weight_fg is None:
+            weight_fg = float(torch.sum(m_bg)) / torch.numel(target)
+
+        ctx.save_for_backward(pred, target)
+        ctx.weight_bg = weight_bg
+        ctx.weight_fg = weight_fg
+
+        loss = gendsc_loss(pred, target, weight_bg, weight_fg)
+
+        return loss
+
+    @staticmethod
+    def backward(ctx, grad_output):
+
+        pred_y, target = ctx.saved_tensors
+
+        negative = (1 - target) * pred_y ** 2
+        positive = target * (1 - pred_y) ** 2
+        dsigmoid = ctx.weight_bg * negative - ctx.weight_fg * positive
+
+        grad_input = grad_output * dsigmoid
+
+        return grad_input, None
+
+
 """
 Binary losses (validation)
 """

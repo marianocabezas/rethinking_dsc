@@ -218,6 +218,8 @@ def train(
         log_file=log_file
     )
     net.save_model(os.path.join(d_path, model_name))
+    net.save_first(os.path.join(d_path, 'first_' + model_name))
+    net.save_last(os.path.join(d_path, 'last_' + model_name))
 
 
 def cross_val(

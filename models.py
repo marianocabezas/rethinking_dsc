@@ -630,10 +630,10 @@ class ResConv3dBlock(BaseConv3dBlock):
 
     def forward(self, inputs):
         res = inputs if self.res is None else self.res(inputs)
-        res = self.first(inputs) + res
+        out = self.first(inputs) + res
         for c in self.seq:
-            res = c(res) + res
-        return res
+            out = c(out) + res
+        return out
 
 
 class SimpleUNet(BaseModel):
@@ -684,7 +684,7 @@ class SimpleUNet(BaseModel):
         # <Parameter setup>
 
         self.ae = Autoencoder(
-            self.conv_filters, device, n_images, block=ResConv3dBlock,
+            self.conv_filters, device, n_images, block=Conv3dBlock,
             pooling=True, norm=norm_f
         )
         self.ae.to(device)

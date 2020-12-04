@@ -17,7 +17,7 @@ def analyse_lesions(d_path, verbose=0):
     eval_start = time.time()
 
     if verbose > 0:
-        print(''.join(['-'] * 89))
+        print(''.join(['-'] * 58))
         print(
             '{:}{:^18}||{:^8}|{:^8}|{:^8}||{:^9}|'.format(
                 c['clr'], 'Patient (t)', 'Vox', 'Lesions', '%', 'Brain'
@@ -83,6 +83,8 @@ def analyse_lesions(d_path, verbose=0):
 
 
 def main(verbose=1):
+    # Init
+    c = color_codes()
     path_list = [
         '/home/mariano/data/DiceProject/longitudinal',
         '/home/mariano/data/DiceProject/msseg',
@@ -91,7 +93,7 @@ def main(verbose=1):
         '/home/mariano/data/DiceProject/cross-sectional',
     ]
     for d_path in path_list:
-        print('Analysing - {:}'.format(d_path))
+        print('{:}{:>57}|'.format(c['clr'], d_path))
         analyse_lesions(d_path, verbose=verbose)
 
 

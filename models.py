@@ -643,6 +643,12 @@ class SimpleUNet(BaseModel):
             verbose=0,
     ):
         super().__init__()
+        # We are applying the sigmoid function as part of the loss function
+        # for a single reason. We want to define a loss functions whose
+        # derivative with respect to the output of the network is defined
+        # to follow certain properties. As such, we want the sigmoid to be
+        # part of the derivative to avoid the derivative of the sigmoid and
+        # its issues when not taking into account inside the loss.
         losses = {
             'xent': lambda x, y: F.binary_cross_entropy(
                 torch.sigmoid(x), y.type_as(x).to(x.device)

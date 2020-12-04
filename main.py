@@ -306,9 +306,9 @@ def main(verbose=2):
                 for nr in [0, 1, 2, 3]:
                     print(
                         '{:}[{:}] {:}Starting cross-validation {:d} - '
-                        'seed {:d} {:}({:}){:}'.format(
+                        'seed {:d} - negative ratio {:d} {:}({:}){:}'.format(
                             c['c'], strftime("%H:%M:%S"), c['g'], test_n,
-                            seed, c['y'], loss, c['nc']
+                            seed, nr, c['y'], loss, c['nc']
                         )
                     )
                     cross_val(

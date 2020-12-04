@@ -159,9 +159,9 @@ def train(
         print('Preparing the training datasets / dataloaders')
 
     # Here we'll do the training / validation split...
-    d_train = d_val = [t['images'] for t in train_dicts]
-    r_train = r_val = [t['brain'] for t in train_dicts]
-    m_train = m_val = [t['lesion'] for t in train_dicts]
+    d_train = [t['images'] for t in train_dicts]
+    r_train = [t['brain'] for t in train_dicts]
+    m_train = [t['lesion'] for t in train_dicts]
     d_test = [t['images'] for t in test_dicts]
     r_test = [t['brain'] for t in test_dicts]
     m_test = [t['lesion'] for t in test_dicts]
@@ -181,7 +181,7 @@ def train(
     # Validation
     if verbose > 1:
         print('< Validation dataset >')
-    val_dataset = LesionDataset(d_val, m_val, r_val)
+    val_dataset = LesionDataset(d_train, m_train, r_train)
     if verbose > 1:
         print('Dataloader creation <val>')
     val_loader = DataLoader(val_dataset, 1)

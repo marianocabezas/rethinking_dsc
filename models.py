@@ -699,7 +699,9 @@ class SimpleUNet(BaseModel):
             {
                 'name': 'loss',
                 'weight': 1,
-                'f': lambda p, t: losses[base_loss](p, t)
+                'f': lambda p, t: losses[base_loss](
+                    torch.sigmoid(p), t
+                )
             },
         ]
 
@@ -707,28 +709,36 @@ class SimpleUNet(BaseModel):
             {
                 'name': 'dsc',
                 'weight': 1,
-                'f': lambda p, t: dsc_binary_loss(p, t)
+                'f': lambda p, t: dsc_binary_loss(
+                    torch.sigmoid(p), t
+                )
             },
             {
                 'name': 'fn',
                 'weight': 0,
-                'f': lambda p, t: tp_binary_loss(p, t)
+                'f': lambda p, t: tp_binary_loss(
+                    torch.sigmoid(p), t
+                )
             },
             {
                 'name': 'fp',
                 'weight': 0,
-                'f': lambda p, t: tn_binary_loss(p, t)
+                'f': lambda p, t: tn_binary_loss(
+                    torch.sigmoid(p), t
+                )
             },
             {
                 'name': 'gdsc',
                 'weight': 0,
-                'f': lambda p, t: gendsc_loss(p, t)
+                'f': lambda p, t: gendsc_loss(
+                    torch.sigmoid(p), t
+                )
             },
             {
                 'name': 'xent',
                 'weight': 0,
                 'f': lambda p, t: F.binary_cross_entropy(
-                    p, t.type_as(p).to(p.device)
+                    torch.sigmoid(p), t.type_as(p).to(p.device)
                 )
             },
         ]

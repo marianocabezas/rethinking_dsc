@@ -77,6 +77,7 @@ def main(verbose=2):
         '/home/mariano/data/DiceProject/cross-sectional',
     ]
     for d_path in path_list:
+        print('Analysing - {:}'.format(d_path))
         analyse_lesions(d_path, verbose=verbose)
 
 

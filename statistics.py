@@ -9,10 +9,7 @@ from utils import color_codes, get_dirs, get_int, time_to_string
 def analyse_lesions(d_path, verbose=0):
     # Init
     c = color_codes()
-    patients = [
-        (t, p) for p in sorted(get_dirs(d_path), key=get_int)
-        for t in get_dirs(os.path.join(d_path, p))
-    ]
+    patients = sorted(get_dirs(d_path))
     n_cases = len(patients)
     eval_start = time.time()
 

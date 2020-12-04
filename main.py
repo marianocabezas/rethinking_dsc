@@ -239,9 +239,9 @@ def cross_val(
         np.random.seed(seed_i)
         torch.manual_seed(seed_i)
         print(
-            '{:}Starting fold {:} {:}({:}) {:}'.format(
+            '{:}Starting fold {:} {:}({:}) {:}{:d}'.format(
                 c['c'], c['g'] + str(i) + c['nc'],
-                c['y'], loss, c['nc'] + d_path
+                c['y'], loss, c['nc'] + d_path, negative_ratio
             )
         )
 

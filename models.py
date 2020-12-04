@@ -671,7 +671,7 @@ class SimpleUNet(BaseModel):
         self.init = False
         # Init values
         if conv_filters is None:
-            self.conv_filters = list([32, 128, 512, 1024])
+            self.conv_filters = list([32, 64, 256, 512])
         else:
             self.conv_filters = conv_filters
         self.epoch = 0
@@ -683,7 +683,8 @@ class SimpleUNet(BaseModel):
         # <Parameter setup>
 
         self.ae = Autoencoder(
-            self.conv_filters, device, n_images, block=ResConv3dBlock,
+            self.conv_filters, device, n_images,
+            block=partial(ResConv3dBlock, n_conv=2),
             pooling=True, norm=norm_f
         )
         self.ae.to(device)

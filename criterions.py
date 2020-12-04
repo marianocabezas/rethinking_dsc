@@ -138,17 +138,18 @@ class PrincipledLoss(torch.autograd.Function):
     def forward(ctx, pred, target, weight_bg=None, weight_fg=None):
         m_bg = target == 0
         m_fg = target > 0
+        y_hat = torch.sigmoid(pred)
 
         if weight_bg is None:
             weight_bg = float(torch.sum(m_fg)) / torch.numel(target)
         if weight_fg is None:
             weight_fg = float(torch.sum(m_bg)) / torch.numel(target)
 
-        ctx.save_for_backward(pred, target)
+        ctx.save_for_backward(y_hat, target)
         ctx.weight_bg = weight_bg
         ctx.weight_fg = weight_fg
 
-        loss = gendsc_loss(pred, target)
+        loss = gendsc_loss(y_hat, target)
 
         return loss
 

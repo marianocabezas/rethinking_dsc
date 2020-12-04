@@ -651,22 +651,22 @@ class SimpleUNet(BaseModel):
         super().__init__()
         losses = {
             'xent': lambda x, y: F.binary_cross_entropy(
-                x, y.type_as(x).to(x.device)
+                torch.sigmoid(x), y.type_as(x).to(x.device)
             ),
             'xent_w': lambda x, y: focal_loss(
-                x, y.type_as(x).to(x.device), alpha=0.75, gamma=0
+                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0.75, gamma=0
             ),
             'gdsc': partial(gendsc_loss, batch=False),
             'gdsc_b': gendsc_loss,
             'dsc': partial(gendsc_loss, w_bg=0, w_fg=1),
             'focal': lambda x, y: focal_loss(
-                x, y.type_as(x).to(x.device), alpha=0
+                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0
             ),
             'focal_w1': lambda x, y: focal_loss(
-                x, y.type_as(x).to(x.device), alpha=0.25
+                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0.25
             ),
             'focal_w2': lambda x, y: focal_loss(
-                x, y.type_as(x).to(x.device), alpha=0.75
+                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0.75
             ),
             'new': lambda x, y: new_loss(
                 x, y.type_as(x).to(x.device)
@@ -675,7 +675,7 @@ class SimpleUNet(BaseModel):
         self.init = False
         # Init values
         if conv_filters is None:
-            self.conv_filters = list([64, 128, 256, 512])
+            self.conv_filters = list([32, 128, 512, 1024])
         else:
             self.conv_filters = conv_filters
         self.epoch = 0
@@ -749,7 +749,7 @@ class SimpleUNet(BaseModel):
 
     def forward(self, data):
         features = self.ae(data)
-        seg = torch.sigmoid(self.segmenter(features))
+        seg = self.segmenter(features)
         return seg
 
     def lesions(self, data):

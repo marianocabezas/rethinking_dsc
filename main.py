@@ -107,6 +107,7 @@ def get_images(d_path, image_tags=None, verbose=0):
             os.path.join(p_path, file) for file in os.listdir(p_path)
             if not os.path.isdir(file) and re.search(tag_string, file)
         ]
+        print(files)
         brain = get_mask(os.path.join(p_path, 'brain.nii.gz'))
         lesion = load_nii(os.path.join(p_path, 'lesion.nii.gz')).get_fdata()
         lesion = (lesion == 1).astype(np.uint8)

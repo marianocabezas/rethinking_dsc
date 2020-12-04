@@ -9,6 +9,9 @@ from utils import color_codes, get_dirs, get_int, time_to_string
 def analyse_lesions(d_path, verbose=0):
     # Init
     c = color_codes()
+    voxels = 0
+    lesions = 0
+    brain_voxels = 0
     patients = sorted(get_dirs(d_path))
     n_cases = len(patients)
     eval_start = time.time()
@@ -41,26 +44,38 @@ def analyse_lesions(d_path, verbose=0):
                 end='\r'
             )
 
-        cel_mask = load_nii(
+        lesion_mask = load_nii(
             os.path.join(image_path, 'lesion.nii.gz')
         ).get_fdata().astype(np.bool)
         brain_mask = load_nii(
             os.path.join(image_path, 'brain.nii.gz')
         ).get_fdata().astype(np.bool)
 
-        voxels_i = np.sum(cel_mask)
-        labels = bwlabeln(cel_mask)
+        voxels_i = np.sum(lesion_mask)
+        voxels += voxels_i
+        labels = bwlabeln(lesion_mask)
         lesions_i = np.max(labels)
-        brain_voxels = np.sum(brain_mask)
+        lesions += lesions_i
+        brain_voxels_i = np.sum(brain_mask)
+        brain_voxels += brain_voxels_i
 
-        if verbose > 0:
+        if verbose > 1:
             print(
-                '{:}{:>15}||{:8d}|{:8d}|{:7.4f}%||{:9d}|'.format(
+                '{:}{:>18}||{:8d}|{:8d}|{:7.4f}%||{:9d}|'.format(
                     c['clr'], patient,
-                    voxels_i, lesions_i, 100 * voxels_i / brain_voxels,
-                    brain_voxels
+                    voxels_i, lesions_i, 100 * voxels_i / brain_voxels_i,
+                    brain_voxels_i
                 )
             )
+    if verbose > 0:
+        print(
+            '{:}{:>18}||{:8d}|{:8d}|{:7.4f}%||{:9d}|'.format(
+                c['clr'], 'Mean',
+                voxels, lesions, 100 * voxels / brain_voxels,
+                brain_voxels
+            )
+        )
+
 
 """
 > Dummy main function

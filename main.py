@@ -275,9 +275,10 @@ def main(verbose=2):
                         torch.manual_seed(seed_i)
                         print(
                             '{:}Starting fold {:} {:}({:}) {:} - '
-                            'ratio {:d}'.format(
+                            '{:}[ratio {:d}]{:}'.format(
                                 c['c'], c['g'] + str(i) + c['nc'],
-                                c['y'], loss, c['nc'] + d_path, nr
+                                c['y'], loss, c['nc'] + d_path, nr,
+                                c['g'], c['nc']
                             )
                         )
 

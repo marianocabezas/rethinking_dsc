@@ -675,7 +675,7 @@ class SimpleUNet(BaseModel):
         self.init = False
         # Init values
         if conv_filters is None:
-            self.conv_filters = list([32, 128, 512, 1024])
+            self.conv_filters = list([16, 32, 64, 128])
         else:
             self.conv_filters = conv_filters
         self.epoch = 0

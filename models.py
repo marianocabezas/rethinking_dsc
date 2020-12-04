@@ -611,11 +611,7 @@ class ResConv3dBlock(BaseConv3dBlock):
         )
 
         if filters_in != filters_out:
-            self.res = nn.Sequential(
-                conv(filters_in, filters_out, 1),
-                activation(filters_out),
-                norm(filters_out)
-            )
+            self.res = conv(filters_in, filters_out, 1),
         else:
             self.res = None
 
@@ -675,7 +671,7 @@ class SimpleUNet(BaseModel):
         self.init = False
         # Init values
         if conv_filters is None:
-            self.conv_filters = list([16, 32, 64, 128])
+            self.conv_filters = list([32, 128, 512, 1024])
         else:
             self.conv_filters = conv_filters
         self.epoch = 0

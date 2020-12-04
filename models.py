@@ -650,10 +650,7 @@ class SimpleUNet(BaseModel):
     ):
         super().__init__()
         losses = {
-            # 'xent': lambda x, y: F.binary_cross_entropy(
-            #     x, y.type_as(x).to(x.device)
-            # ),
-            'xent': lambda x, y: new_loss(
+            'xent': lambda x, y: F.binary_cross_entropy(
                 x, y.type_as(x).to(x.device)
             ),
             'xent_w': lambda x, y: focal_loss(
@@ -670,6 +667,9 @@ class SimpleUNet(BaseModel):
             ),
             'focal_w2': lambda x, y: focal_loss(
                 x, y.type_as(x).to(x.device), alpha=0.75
+            ),
+            'new': lambda x, y: new_loss(
+                x, y.type_as(x).to(x.device)
             ),
         }
         self.init = False

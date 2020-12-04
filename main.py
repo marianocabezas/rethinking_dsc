@@ -298,7 +298,7 @@ def main(verbose=2):
     # Might do it "later".
     seeds = [42, 80702, 74794, 62021, 48497]
     losses = [
-        'xent', 'gdsc', 'gdsc_b', 'dsc', 'focal', 'focal_w1', 'focal_w2'
+        'xent', 'gdsc', 'gdsc_b', 'dsc', 'focal', 'focal_w1', 'focal_w2', 'new'
     ]
     # ratios = [0, 1, 2, 3]
     ratios = [0, 1]

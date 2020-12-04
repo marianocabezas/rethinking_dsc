@@ -570,14 +570,14 @@ class Conv3dBlock(BaseConv3dBlock):
             activation = self.default_activation
         self.block = nn.Sequential(
             self.conv(filters_in, filters_out),
-            activation(filters_out),
             norm(filters_out)
+            activation(filters_out),
         )
         self.extra = nn.ModuleList([
             nn.Sequential(
                 self.conv(filters_out, filters_out),
-                activation(filters_out),
                 norm(filters_out)
+                activation(filters_out),
             )
             for _ in range(n_conv - 1)
         ])
@@ -606,15 +606,15 @@ class ResConv3dBlock(BaseConv3dBlock):
 
         self.first = nn.Sequential(
             self.conv(filters_in, filters_out),
+            norm(filters_out),
             activation(filters_out),
-            norm(filters_out)
         )
 
         if filters_in != filters_out:
             self.res = nn.Sequential(
                 conv(filters_in, filters_out, 1),
+                norm(filters_out),
                 activation(filters_out),
-                norm(filters_out)
             )
         else:
             self.res = None
@@ -622,8 +622,8 @@ class ResConv3dBlock(BaseConv3dBlock):
         self.seq = nn.ModuleList([
             nn.Sequential(
                 self.conv(filters_out, filters_out),
+                norm(filters_out),
                 activation(filters_out),
-                norm(filters_out)
             )
             for _ in range(n_conv - 1)
         ])

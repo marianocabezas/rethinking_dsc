@@ -20,7 +20,7 @@ def analyse_lesions(d_path, verbose=0):
         print(''.join(['-'] * 58))
         print(
             '{:}{:^18}||{:^8}|{:^8}|{:^8}||{:^9}|'.format(
-                c['clr'], 'Patient (t)', 'Vox', 'Lesions', '%', 'Brain'
+                c['clr'], 'Patient', 'Vox', 'Lesions', '%', 'Brain'
             )
         )
     for i, patient in enumerate(patients):

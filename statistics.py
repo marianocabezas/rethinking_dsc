@@ -82,7 +82,7 @@ def analyse_lesions(d_path, verbose=0):
 """
 
 
-def main(verbose=2):
+def main(verbose=1):
     path_list = [
         '/home/mariano/data/DiceProject/longitudinal',
         '/home/mariano/data/DiceProject/msseg',

@@ -222,56 +222,6 @@ def train(
     net.save_last(os.path.join(d_path, 'last_' + model_name))
 
 
-def cross_val(
-        d_path, n_folds=5, seed=42, loss='xent', negative_ratio=1, verbose=0
-):
-    # Init
-    c = color_codes()
-
-    np.random.seed(seed)
-    cross_seeds = np.random.randint(0, 10000, n_folds)
-
-    patient_dicts, n_images = get_images(d_path)
-
-    n_patients = len(patient_dicts)
-
-    for i, seed_i in enumerate(cross_seeds):
-        np.random.seed(seed_i)
-        torch.manual_seed(seed_i)
-        print(
-            '{:}Starting fold {:} {:}({:}) {:}{:d}'.format(
-                c['c'], c['g'] + str(i) + c['nc'],
-                c['y'], loss, c['nc'] + d_path, negative_ratio
-            )
-        )
-
-        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.pt'.format(
-            loss, negative_ratio, seed, i
-        )
-        net = SimpleUNet(n_images=n_images, base_loss=loss)
-
-        try:
-            net.load_model(model_name)
-        except IOError:
-            # Training
-            ini_test = n_patients * i // n_folds
-            end_test = n_patients * (i + 1) // n_folds
-            training = patient_dicts[end_test:] + patient_dicts[:ini_test]
-            testing = patient_dicts[ini_test:end_test]
-
-            csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.csv'.format(
-                loss, negative_ratio, seed, i
-            )
-
-            with open(os.path.join(d_path, csv_name), 'w') as csvfile:
-                csvwriter = csv.writer(csvfile)
-                train(
-                    d_path, net, model_name, training, testing,
-                    negative_ratio=negative_ratio, log_file=csvwriter,
-                    verbose=verbose
-                )
-
-
 """
 > Dummy main function
 """
@@ -282,6 +232,7 @@ def main(verbose=2):
     torch.backends.cudnn.deterministic = True
     # torch.backends.cudnn.benchmark = False
 
+    n_folds = 5
     c = color_codes()
     options = parse_inputs()
     path_list = options['data_dir']
@@ -305,18 +256,58 @@ def main(verbose=2):
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
             for nr in ratios:
-                for loss in losses:
-                    print(
-                        '{:}[{:}] {:}Starting cross-validation {:d} - '
-                        'seed {:d} - negative ratio {:d} {:}({:}){:}'.format(
-                            c['c'], strftime("%H:%M:%S"), c['g'], test_n,
-                            seed, nr, c['y'], loss, c['nc']
+                print(
+                    '{:}[{:}] {:}Starting cross-validation {:d} - '
+                    'seed {:d} - negative ratio {:d} {:}({:}){:}'.format(
+                        c['c'], strftime("%H:%M:%S"), c['g'], test_n,
+                        seed, nr, c['y'], loss, c['nc']
+                    )
+                )
+                np.random.seed(seed)
+                cross_seeds = np.random.randint(0, 10000, n_folds)
+
+                patient_dicts, n_images = get_images(d_path)
+                n_patients = len(patient_dicts)
+
+                for i, seed_i in enumerate(cross_seeds):
+                    for loss in losses:
+                        np.random.seed(seed_i)
+                        torch.manual_seed(seed_i)
+                        print(
+                            '{:}Starting fold {:} {:}({:}) {:}{:d}'.format(
+                                c['c'], c['g'] + str(i) + c['nc'],
+                                c['y'], loss, c['nc'] + d_path, nr
+                            )
                         )
-                    )
-                    cross_val(
-                        d_path, seed=seed, loss=loss, verbose=verbose,
-                        negative_ratio=nr
-                    )
+
+                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.pt'.format(
+                            loss, nr, seed, i
+                        )
+                        net = SimpleUNet(n_images=n_images, base_loss=loss)
+
+                        try:
+                            net.load_model(model_name)
+                        except IOError:
+                            # Training
+                            ini_test = n_patients * i // n_folds
+                            end_test = n_patients * (i + 1) // n_folds
+                            training = patient_dicts[end_test:] +\
+                                       patient_dicts[:ini_test]
+                            testing = patient_dicts[ini_test:end_test]
+
+                            csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.csv'
+
+                            with open(
+                                    os.path.join(d_path, csv_name.format(
+                                        loss, nr, seed, i
+                                    )), 'w'
+                            ) as csvfile:
+                                csvwriter = csv.writer(csvfile)
+                                train(
+                                    d_path, net, model_name, training, testing,
+                                    negative_ratio=nr, log_file=csvwriter,
+                                    verbose=verbose
+                                )
 
 
 if __name__ == '__main__':

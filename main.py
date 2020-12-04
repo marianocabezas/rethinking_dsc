@@ -245,8 +245,8 @@ def cross_val(
             )
         )
 
-        model_name = 'unet-{:}.s{:d}.n{:d}.pt'.format(
-            loss, seed, i
+        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.pt'.format(
+            loss, negative_ratio, seed, i
         )
         net = SimpleUNet(n_images=n_images, base_loss=loss)
 
@@ -300,10 +300,12 @@ def main(verbose=2):
     losses = [
         'xent', 'gdsc', 'gdsc_b', 'dsc', 'focal', 'focal_w1', 'focal_w2'
     ]
+    # ratios = [0, 1, 2, 3]
+    ratios = [0, 1]
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
             for loss in losses:
-                for nr in [0, 1, 2, 3]:
+                for nr in ratios:
                     print(
                         '{:}[{:}] {:}Starting cross-validation {:d} - '
                         'seed {:d} - negative ratio {:d} {:}({:}){:}'.format(

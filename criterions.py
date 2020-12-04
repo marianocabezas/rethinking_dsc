@@ -148,7 +148,7 @@ class PrincipledLoss(torch.autograd.Function):
         ctx.weight_bg = weight_bg
         ctx.weight_fg = weight_fg
 
-        loss = gendsc_loss(pred, target, weight_bg, weight_fg)
+        loss = gendsc_loss(pred, target)
 
         return loss
 

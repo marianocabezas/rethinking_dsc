@@ -684,7 +684,7 @@ class SimpleUNet(BaseModel):
         # <Parameter setup>
 
         self.ae = Autoencoder(
-            self.conv_filters, device, n_images, block=Conv3dBlock,
+            self.conv_filters, device, n_images, block=ResConv3dBlock,
             pooling=True, norm=norm_f
         )
         self.ae.to(device)

@@ -611,7 +611,7 @@ class ResConv3dBlock(BaseConv3dBlock):
         )
 
         if filters_in != filters_out:
-            self.res = conv(filters_in, filters_out, 1),
+            self.res = conv(filters_in, filters_out, 1)
         else:
             self.res = None
 

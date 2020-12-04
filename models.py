@@ -591,7 +591,7 @@ class Conv3dBlock(BaseConv3dBlock):
 
 class ResConv3dBlock(BaseConv3dBlock):
     def __init__(
-            self, filters_in, filters_out, n_conv=1,
+            self, filters_in, filters_out, n_conv=3,
             kernel=3, norm=None, activation=None, inv=False
     ):
         super().__init__(filters_in, filters_out, kernel, inv)
@@ -671,7 +671,7 @@ class SimpleUNet(BaseModel):
         self.init = False
         # Init values
         if conv_filters is None:
-            self.conv_filters = list([32, 64, 256, 512])
+            self.conv_filters = list([32, 64, 256, 1024])
         else:
             self.conv_filters = conv_filters
         self.epoch = 0
@@ -683,8 +683,7 @@ class SimpleUNet(BaseModel):
         # <Parameter setup>
 
         self.ae = Autoencoder(
-            self.conv_filters, device, n_images,
-            block=partial(ResConv3dBlock, n_conv=2),
+            self.conv_filters, device, n_images, block=ResConv3dBlock,
             pooling=True, norm=norm_f
         )
         self.ae.to(device)

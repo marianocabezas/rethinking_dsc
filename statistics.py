@@ -55,8 +55,8 @@ def analyse_lesions(d_path, verbose=0):
 
         if verbose > 0:
             print(
-                '{:}{:>7} ({:>8})||{:8d}|{:8d}|{:7.4f}%||{:9d}|'.format(
-                    c['clr'], patient, timepoint,
+                '{:}{:>15}||{:8d}|{:8d}|{:7.4f}%||{:9d}|'.format(
+                    c['clr'], patient,
                     voxels_i, lesions_i, 100 * voxels_i / brain_voxels,
                     brain_voxels
                 )

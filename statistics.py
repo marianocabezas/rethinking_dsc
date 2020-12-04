@@ -20,8 +20,8 @@ def analyse_lesions(d_path, verbose=0):
                 c['clr'], 'Patient (t)', 'Vox', 'Lesions', '%', 'Brain'
             )
         )
-    for i, (timepoint, patient) in enumerate(patients):
-        image_path = os.path.join(d_path, patient, timepoint, 'preprocessed')
+    for i, patient in enumerate(patients):
+        image_path = os.path.join(d_path, patient)
         if verbose > 0:
             t_elapsed = time.time() - eval_start
             elapsed_s = time_to_string(t_elapsed)
@@ -32,10 +32,9 @@ def analyse_lesions(d_path, verbose=0):
             steps_left = n_cases - i
             eta_s = time_to_string(steps_left * t_step)
             print(
-                '{:}Evaluating patient {:} [t = {:}] '
-                '{:}[{:3d}/{:3d} - {:5.2f}%] {:} ETA: {:}'.format(
-                    c['clr'], c['g'] + patient[:5] + c['nc'],
-                    c['y'] + timepoint + c['nc'], c['c'],
+                '{:}Evaluating patient {:}[{:3d}/{:3d} - {:5.2f}%]'
+                ' {:} ETA: {:}'.format(
+                    c['clr'], c['g'] + patient[:5] + c['nc'] + c['c'],
                     i + 1, n_cases, 100 * (i + 1) / n_cases,
                     c['g'] + elapsed_s, eta_s + c['nc']
                 ),

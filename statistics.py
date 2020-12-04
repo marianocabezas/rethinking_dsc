@@ -80,7 +80,7 @@ def main(verbose=2):
         '/home/mariano/data/DiceProject/cross-sectional',
     ]
     for d_path in path_list:
-        analyse_lesions(d_path, verbose=2)
+        analyse_lesions(d_path, verbose=verbose)
 
 
 if __name__ == '__main__':

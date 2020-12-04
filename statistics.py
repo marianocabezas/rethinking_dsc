@@ -93,7 +93,7 @@ def main(verbose=1):
         '/home/mariano/data/DiceProject/cross-sectional',
     ]
     for d_path in path_list:
-        print('{:}{:>57}|'.format(c['clr'], d_path))
+        print('{:}{:>57}|'.format(c['clr'] + c['g'], d_path + c['nc']))
         analyse_lesions(d_path, verbose=verbose)
 
 

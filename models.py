@@ -443,14 +443,13 @@ class Autoencoder(BaseModel):
         block_partial = partial(
             block, kernel=kernel, norm=norm, activation=activation
         )
+        self.n_inputs = n_inputs
         self.pooling = pooling
         self.device = device
         self.dropout = dropout
         self.filters = conv_filters
 
-        conv_in, conv_out, deconv_in, deconv_out = block.compute_filters(
-            n_inputs, conv_filters
-        )
+        conv_in, conv_out, deconv_in, deconv_out = self.compute_filters()
 
         # Down path
         # We'll use the partial and fill it with the channels for input and
@@ -529,6 +528,15 @@ class Autoencoder(BaseModel):
 
         return output
 
+    def compute_filters(self):
+        conv_in = [self.n_inputs] + self.filters[:-2]
+        conv_out = self.filters[:-1]
+        down_out = self.filters[-2::-1]
+        up_out = self.filters[:0:-1]
+        deconv_in = list(map(sum, zip(down_out, up_out)))
+        deconv_out = down_out
+        return conv_in, conv_out, deconv_in, deconv_out
+
 
 class BaseConv3dBlock(BaseModel):
     def __init__(self, filters_in, filters_out, kernel, inv):
@@ -548,16 +556,6 @@ class BaseConv3dBlock(BaseModel):
     @staticmethod
     def default_activation(n_filters):
         return nn.ReLU()
-
-    @staticmethod
-    def compute_filters(n_inputs, conv_filters):
-        conv_in = [n_inputs] + conv_filters[:-2]
-        conv_out = conv_filters[:-1]
-        down_out = conv_filters[-2::-1]
-        up_out = conv_filters[:0:-1]
-        deconv_in = list(map(sum, zip(down_out, up_out)))
-        deconv_out = down_out
-        return conv_in, conv_out, deconv_in, deconv_out
 
 
 class Conv3dBlock(BaseConv3dBlock):
@@ -591,7 +589,7 @@ class Conv3dBlock(BaseConv3dBlock):
 
 class ResConv3dBlock(BaseConv3dBlock):
     def __init__(
-            self, filters_in, filters_out, n_conv=3,
+            self, filters_in, filters_out, n_conv=1,
             kernel=3, norm=None, activation=None, inv=False
     ):
         super().__init__(filters_in, filters_out, kernel, inv)
@@ -683,7 +681,8 @@ class SimpleUNet(BaseModel):
         # <Parameter setup>
 
         self.ae = Autoencoder(
-            self.conv_filters, device, n_images, block=ResConv3dBlock,
+            self.conv_filters, device, n_images,
+            block=partial(ResConv3dBlock, n_conv=3),
             pooling=True, norm=norm_f
         )
         self.ae.to(device)

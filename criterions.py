@@ -163,7 +163,7 @@ class PrincipledLoss(torch.autograd.Function):
 
         grad_input = grad_output * dsigmoid
 
-        return grad_input, None
+        return grad_input, None, None, None
 
 
 """

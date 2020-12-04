@@ -304,8 +304,8 @@ def main(verbose=2):
     ratios = [0, 1]
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
-            for loss in losses:
-                for nr in ratios:
+            for nr in ratios:
+                for loss in losses:
                     print(
                         '{:}[{:}] {:}Starting cross-validation {:d} - '
                         'seed {:d} - negative ratio {:d} {:}({:}){:}'.format(

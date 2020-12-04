@@ -136,10 +136,8 @@ class LesionCroppingDataset(Dataset):
             ]
             self.negative_slices = [
                 (s, i)
-                for i, (label, mask, s_i) in enumerate(
-                    zip(self.labels, self.masks, slices)
-                )
-                for s in s_i if (np.sum(label[s]) == 0) & (np.sum(mask[s]) > 0)
+                for i, (label, s_i) in enumerate(zip(self.labels, slices))
+                for s in s_i if np.sum(label[s]) == 0
             ]
             self.current_negative = deepcopy(self.negative_slices)
         else:

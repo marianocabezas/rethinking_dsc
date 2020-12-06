@@ -274,7 +274,7 @@ def main(verbose=2):
                         np.random.seed(seed_i)
                         torch.manual_seed(seed_i)
                         print(
-                            '{:}Starting fold {:}({:}) {:} '
+                            '{:}Starting fold {:} ({:}) {:} '
                             '{:}[ratio {:d}]{:}'.format(
                                 c['c'], c['g'] + str(i) + c['nc'] + c['y'],
                                 loss, c['nc'] + d_path, c['g'], nr, c['nc']

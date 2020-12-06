@@ -29,7 +29,7 @@ def focal_loss(pred, target, alpha=0.25, gamma=2.0):
     alpha_fg = alpha
     alpha_bg = 1 - alpha
     pt_fg = pred[m_fg]
-    pt_bg = (1 - pred[m_fg])
+    pt_bg = (1 - pred[m_bg])
 
     bce = F.binary_cross_entropy(pred, target, reduction='none')
     bce_fg = bce[m_fg]

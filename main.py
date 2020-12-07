@@ -287,7 +287,7 @@ def main(verbose=2):
                         net = SimpleUNet(n_images=n_images, base_loss=loss)
 
                         try:
-                            net.load_model(model_name)
+                            net.load_model(os.path.join(d_path, model_name))
                         except IOError:
                             # Training
                             ini_test = n_patients * i // n_folds

@@ -264,10 +264,9 @@ def main(verbose=2):
         for test_n, seed in enumerate(seeds):
             for nr in ratios:
                 print(
-                    '{:}[{:}] {:}Starting cross-validation {:d} - '
-                    'seed {:d} - negative ratio {:d}{:}'.format(
+                    '{:}[{:}] {:}Starting cross-validation {:d}{:}'.format(
                         c['c'], strftime("%H:%M:%S"), c['g'], test_n,
-                        seed, nr, c['nc']
+                        c['nc']
                     )
                 )
                 np.random.seed(seed)

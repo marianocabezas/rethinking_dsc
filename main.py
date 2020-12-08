@@ -289,7 +289,7 @@ def main(verbose=2):
                             )
                         )
 
-                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.lr{:.2e}.pt'
+                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.lr{:.0e}.pt'
                         model_name = model_name.format(
                             loss, nr, seed, i, lr
                         )

@@ -253,6 +253,7 @@ def main(verbose=2):
     ]
     # ratios = [0, 1, 2, 3]
     ratios = [0, 1]
+    lr = 1e-4
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
             for nr in ratios:
@@ -274,17 +275,22 @@ def main(verbose=2):
                         np.random.seed(seed_i)
                         torch.manual_seed(seed_i)
                         print(
-                            '{:}Starting fold {:} ({:}) {:} '
+                            '{:}Starting fold {:} ({:}) {:} - {:d}'
                             '{:}[ratio {:d}]{:}'.format(
                                 c['c'], c['g'] + str(i) + c['nc'] + c['y'],
-                                loss, c['nc'] + d_path, c['g'], nr, c['nc']
+                                loss, c['nc'] + d_path, seed, c['g'], nr,
+                                c['nc']
                             )
                         )
 
-                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.pt'.format(
-                            loss, nr, seed, i
+                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.lr{:.2e}.pt'
+                        model_name = model_name.format(
+                            loss, nr, seed, i, lr
                         )
-                        net = SimpleUNet(n_images=n_images, base_loss=loss)
+                        net = SimpleUNet(
+                            n_images=n_images, base_loss=loss,
+                            lr=lr
+                        )
 
                         try:
                             net.load_model(os.path.join(d_path, model_name))
@@ -296,11 +302,12 @@ def main(verbose=2):
                                        patient_dicts[:ini_test]
                             testing = patient_dicts[ini_test:end_test]
 
-                            csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.csv'
+                            csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
+                                       '.lr{:.0e}.csv'
 
                             with open(
                                     os.path.join(d_path, csv_name.format(
-                                        loss, nr, seed, i
+                                        loss, nr, seed, i, lr
                                     )), 'w'
                             ) as csvfile:
                                 csvwriter = csv.writer(csvfile)

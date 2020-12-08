@@ -56,6 +56,12 @@ def parse_inputs():
         type=int, default=32,
         help='Patch size'
     )
+    parser.add_argument(
+        '-l', '--learning-rate',
+        dest='lr',
+        type=float, default=1e-4,
+        help='Learning rate'
+    )
 
     options = vars(parser.parse_args())
 
@@ -253,7 +259,7 @@ def main(verbose=2):
     ]
     # ratios = [0, 1, 2, 3]
     ratios = [0, 1]
-    lr = 1e-4
+    lr = options['lr']
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
             for nr in ratios:
@@ -275,11 +281,11 @@ def main(verbose=2):
                         np.random.seed(seed_i)
                         torch.manual_seed(seed_i)
                         print(
-                            '{:}Starting fold {:} ({:}) {:} - {:d}'
-                            '{:}[ratio {:d}]{:}'.format(
+                            '{:}Starting fold {:} ({:}) {:} - {:d} '
+                            '{:}[ratio {:d} - lr {:.0e}]{:}'.format(
                                 c['c'], c['g'] + str(i) + c['nc'] + c['y'],
                                 loss, c['nc'] + d_path, seed, c['g'], nr,
-                                c['nc']
+                                lr, c['nc']
                             )
                         )
 

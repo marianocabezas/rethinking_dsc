@@ -657,9 +657,15 @@ class SimpleUNet(BaseModel):
             'xent_w': lambda x, y: focal_loss(
                 torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0.75, gamma=0
             ),
-            'gdsc': partial(gendsc_loss, batch=False),
-            'gdsc_b': gendsc_loss,
-            'dsc': partial(gendsc_loss, w_bg=0, w_fg=1),
+            'gdsc': lambda x, y: gendsc_loss(
+                torch.sigmoid(x), y.type_as(x).to(x.device), batch=False
+            ),
+            'gdsc_b': lambda x, y: gendsc_loss(
+                torch.sigmoid(x), y.type_as(x).to(x.device),
+            ),
+            'dsc': lambda x, y: gendsc_loss(
+                torch.sigmoid(x), y.type_as(x).to(x.device), w_bg=0, w_fg=1
+            ),
             'focal': lambda x, y: focal_loss(
                 torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0
             ),
@@ -704,7 +710,7 @@ class SimpleUNet(BaseModel):
                 'name': 'loss',
                 'weight': 1,
                 'f': lambda p, t: losses[base_loss](
-                    torch.sigmoid(p), t
+                    p, t
                 )
             },
         ]

@@ -296,7 +296,7 @@ def main(verbose=2):
                         )
                         net = SimpleUNet(
                             n_images=n_images, base_loss=loss,
-                            lr=lr
+                            lr=lr, optimiser='sgd'
                         )
 
                         try:
@@ -310,7 +310,7 @@ def main(verbose=2):
                             testing = patient_dicts[ini_test:end_test]
 
                             csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
-                                       '.adam-lr{:.0e}.csv'
+                                       '.sgd-lr{:.0e}.csv'
 
                             with open(
                                     os.path.join(d_path, csv_name.format(

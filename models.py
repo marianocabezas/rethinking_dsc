@@ -209,6 +209,49 @@ class BaseModel(nn.Module):
                 ] + ['time']
             )
 
+            # We are looking for the output, without training, so no need to
+            # use grad.
+            with torch.no_grad():
+                loss_tr, best_loss_tr, _, mid_tr = self.validate(
+                    train_loader, best_loss_tr
+                )
+
+                loss_val, best_loss_val, losses_val_s, mid_val = self.validate(
+                    val_loader, best_loss_val
+                )
+
+                _, best_loss_tst, losses_tst_s, mid_tst = self.validate(
+                    test_loader, best_loss_tst
+                )
+
+                # Doing this also helps setting an initial best loss for all
+                # the necessary losses.
+                if verbose:
+                    # This is just the print for each epoch, but including the
+                    # header.
+                    # Mid losses check
+                    t_out = time.time() - self.t_val
+                    t_s = time_to_string(t_out)
+
+                    epoch_s = '\033[32mInit     \033[0m'
+                    tr_loss_s = '\033[32m{:7.4f}\033[0m'.format(loss_tr)
+                    loss_s = '\033[32m{:7.4f}\033[0m'.format(loss_val)
+                    final_s = ' | '.join(
+                        [epoch_s, tr_loss_s, loss_s] +
+                        losses_val_s + losses_tst_s +
+                        [t_s]
+                    )
+                    print(final_s)
+                if log_file is not None:
+                    log_file.writerow(
+                        [
+                            'Init',
+                            '{:7.4f}'.format(loss_tr),
+                            '{:7.4f}'.format(loss_val)
+                        ] + mid_tr.tolist() + mid_val.tolist() +
+                        mid_tst.tolist() + [t_s]
+                    )
+
         for self.epoch in range(epochs):
             # Main epoch loop
             self.t_train = time.time()

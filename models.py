@@ -666,6 +666,11 @@ class SimpleUNet(BaseModel):
             'dsc': lambda x, y: gendsc_loss(
                 torch.sigmoid(x), y.type_as(x).to(x.device), w_bg=0, w_fg=1
             ),
+            'mixed': lambda x, y: gendsc_loss(
+                torch.sigmoid(x), y.type_as(x).to(x.device), w_bg=0, w_fg=1
+            ) + F.binary_cross_entropy(
+                torch.sigmoid(x), y.type_as(x).to(x.device)
+            ),
             'focal': lambda x, y: focal_loss(
                 torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0
             ),

@@ -639,6 +639,7 @@ class SimpleUNet(BaseModel):
             ),
             n_images=3,
             base_loss='xent',
+            optimiser='adam',
             lr=1e-5,
             dropout=0,
             verbose=0,
@@ -683,6 +684,10 @@ class SimpleUNet(BaseModel):
             'new': lambda x, y: new_loss(
                 x, y.type_as(x).to(x.device)
             ),
+        }
+        optimisers = {
+            'sgd': torch.optim.SGD,
+            'adam': torch.optim.Adam,
         }
         self.init = False
         # Init values
@@ -761,7 +766,7 @@ class SimpleUNet(BaseModel):
         # <Optimizer setup>
         # We do this last step after all parameters are defined
         model_params = filter(lambda p: p.requires_grad, self.parameters())
-        self.optimizer_alg = torch.optim.SGD(model_params, lr=lr)
+        self.optimizer_alg = optimisers[optimiser](model_params, lr=lr)
         if verbose > 1:
             print(
                 'Network created on device {:} with training losses '

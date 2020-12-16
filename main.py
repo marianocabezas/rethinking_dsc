@@ -258,6 +258,7 @@ def main(verbose=2):
         'xent', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
         'focal_w1', 'focal_w2', 'new'
     ]
+    optims = ['adam', 'sgd']
     # ratios = [0, 1, 2, 3]
     ratios = [0, 1]
     lr = options['lr']
@@ -309,7 +310,7 @@ def main(verbose=2):
                             testing = patient_dicts[ini_test:end_test]
 
                             csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
-                                       '.lr{:.0e}.csv'
+                                       '.adam-lr{:.0e}.csv'
 
                             with open(
                                     os.path.join(d_path, csv_name.format(

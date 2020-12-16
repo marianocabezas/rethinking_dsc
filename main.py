@@ -62,7 +62,11 @@ def parse_inputs():
         type=float, default=1e-4,
         help='Learning rate'
     )
-
+    parser.add_argument(
+        '--sgd',
+        dest='sgd', default=False, action='store_true',
+        help='Option to use SGD instead of Adam'
+    )
     options = vars(parser.parse_args())
 
     return options
@@ -258,7 +262,7 @@ def main(verbose=2):
         'xent', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
         'focal_w1', 'focal_w2', 'new'
     ]
-    optims = ['adam', 'sgd']
+    optim = 'sgd' if options['sgd'] else 'adam'
     # ratios = [0, 1, 2, 3]
     ratios = [0, 1]
     lr = options['lr']
@@ -283,20 +287,21 @@ def main(verbose=2):
                         torch.manual_seed(seed_i)
                         print(
                             '{:}Starting fold {:} ({:}) {:} - {:d} '
-                            '{:}[ratio {:d} - lr {:.0e}]{:}'.format(
+                            '{:}[ratio {:d} - {:} lr {:.0e}]{:}'.format(
                                 c['c'], c['g'] + str(i) + c['nc'] + c['y'],
                                 loss, c['nc'] + d_path, seed, c['g'], nr,
-                                lr, c['nc']
+                                optim, lr, c['nc']
                             )
                         )
 
-                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.lr{:.0e}.pt'
+                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.' \
+                                     '{:}-lr{:.0e}.pt'
                         model_name = model_name.format(
-                            loss, nr, seed, i, lr
+                            loss, nr, seed, i, optim, lr
                         )
                         net = SimpleUNet(
                             n_images=n_images, base_loss=loss,
-                            lr=lr, optimiser='sgd'
+                            lr=lr, optimiser=optim
                         )
 
                         try:
@@ -310,11 +315,11 @@ def main(verbose=2):
                             testing = patient_dicts[ini_test:end_test]
 
                             csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
-                                       '.sgd-lr{:.0e}.csv'
+                                       '.{:}-lr{:.0e}.csv'
 
                             with open(
                                     os.path.join(d_path, csv_name.format(
-                                        loss, nr, seed, i, lr
+                                        loss, nr, seed, i, optim, lr
                                     )), 'w'
                             ) as csvfile:
                                 csvwriter = csv.writer(csvfile)

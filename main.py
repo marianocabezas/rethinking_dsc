@@ -305,8 +305,8 @@ def main(verbose=2):
                             # Training
                             ini_test = n_patients * i // n_folds
                             end_test = n_patients * (i + 1) // n_folds
-                            training = patient_dicts[end_test:] +\
-                                       patient_dicts[:ini_test]
+                            training = patient_dicts[end_test:] + \
+                                patient_dicts[:ini_test]
                             testing = patient_dicts[ini_test:end_test]
 
                             csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \

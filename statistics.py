@@ -125,10 +125,10 @@ def save_bands(
     plt.close()
 
 
-def analyse_results(path, loss, ratio, fold, lr):
+def analyse_results(path, net, loss, ratio, fold, lr):
     if isinstance(fold, list):
         tags = [
-            'unet-{:}.'.format(loss), 'nr{:d}'.format(ratio),
+            '{:}-{:}.'.format(net, loss), 'nr{:d}'.format(ratio),
             'lr{:.0e}'.format(lr)
         ]
         suffix = '{:}.nr{:d}.lr{:.0e}'.format(loss, ratio, lr)

@@ -57,6 +57,11 @@ class BaseModel(nn.Module):
         self.acc = None
         self.first_state = None
         self.last_state = None
+        self.train_loader = None
+        self.val_loader = None
+        self.test_loader = None
+        self.log_file = None
+        self.batch_file = None
 
     def forward(self, *inputs):
         """
@@ -117,7 +122,6 @@ class BaseModel(nn.Module):
                 if self.training:
                     batch_loss.backward()
                     self.optimizer_alg.step()
-                    self.batch_update(len(data))
 
             else:
                 # Validation losses (applied to the validation data)
@@ -130,6 +134,8 @@ class BaseModel(nn.Module):
                     for l_f, l in zip(self.val_functions, batch_losses)
                 ])
                 mid_losses.append([loss.tolist() for loss in batch_losses])
+
+            self.batch_update(batch_i, len(data))
 
             # It's important to compute the global loss in both cases.
             loss_value = batch_loss.tolist()
@@ -163,9 +169,15 @@ class BaseModel(nn.Module):
             test_loader,
             epochs=100,
             log_file=None,
+            batch_file=None,
             verbose=True
     ):
         # Init
+        self.train_loader = train_loader
+        self.val_loader = val_loader
+        self.test_loader = test_loader
+        self.log_file = log_file
+        self.batch_file = batch_file
         self.first_state = deepcopy(self.state_dict())
         best_e = 0
         l_names = ['train', ' val '] + [
@@ -213,15 +225,15 @@ class BaseModel(nn.Module):
             # use grad.
             with torch.no_grad():
                 loss_tr, best_loss_tr, _, mid_tr = self.validate(
-                    train_loader, best_loss_tr
+                    self.train_loader, best_loss_tr
                 )
 
                 loss_val, best_loss_val, losses_val_s, mid_val = self.validate(
-                    val_loader, best_loss_val
+                    self.val_loader, best_loss_val
                 )
 
                 _, best_loss_tst, losses_tst_s, mid_tst = self.validate(
-                    test_loader, best_loss_tst
+                    self.test_loader, best_loss_tst
                 )
 
                 # Doing this also helps setting an initial best loss for all
@@ -257,7 +269,7 @@ class BaseModel(nn.Module):
             self.t_train = time.time()
             self.train()
             # First we train and check if there has been an improvement.
-            loss_tr = self.mini_batch_loop(train_loader)
+            loss_tr = self.mini_batch_loop(self.train_loader)
             improvement_tr = self.best_loss_tr > loss_tr
             if improvement_tr:
                 self.best_loss_tr = loss_tr
@@ -267,15 +279,15 @@ class BaseModel(nn.Module):
 
             # Then we validate and check all the losses
             _, best_loss_tr, _, mid_tr = self.validate(
-                train_loader, best_loss_tr
+                self.train_loader, best_loss_tr
             )
 
             loss_val, best_loss_val, losses_val_s, mid_val = self.validate(
-                val_loader, best_loss_val
+                self.val_loader, best_loss_val
             )
 
             _, best_loss_tst, losses_tst_s, mid_tst = self.validate(
-                test_loader, best_loss_tst
+                self.test_loader, best_loss_tst
             )
 
             # Patience check
@@ -304,8 +316,8 @@ class BaseModel(nn.Module):
                     [t_s]
                 )
                 print(final_s)
-            if log_file is not None:
-                log_file.writerow(
+            if self.log_file is not None:
+                self.log_file.writerow(
                     [
                         'Epoch {:03d}'.format(self.epoch),
                         '{:7.4f}'.format(loss_tr),
@@ -361,13 +373,34 @@ class BaseModel(nn.Module):
         """
         return None
 
-    def batch_update(self, batches):
+    def batch_update(self, batch, batches):
         """
         Callback function to update something on the model after the batch
         is finished. To be reimplemented if necessary.
+        :param batch: Current batch
         :param batches: Maximum number of epochs
         :return: Nothing.
         """
+        if self.batch_file is not None:
+            # Then we validate and check all the losses
+            loss_tr, _, _, mid_tr = self.validate(
+                self.train_loader, 0
+            )
+
+            loss_val, _, _, mid_val = self.validate(
+                self.val_loader, 0
+            )
+
+            _, _, _, mid_tst = self.validate(
+                self.test_loader, 0
+            )
+            self.batch_file.writerow(
+                [
+                    'Epoch {:03d} - Batch {:04d}'.format(self.epoch, batch),
+                    '{:7.4f}'.format(loss_tr),
+                    '{:7.4f}'.format(loss_val)
+                ] + mid_tr.tolist() + mid_val.tolist() + mid_tst.tolist()
+            )
         return None
 
     def print_progress(self, batch_i, n_batches, b_loss, mean_loss):

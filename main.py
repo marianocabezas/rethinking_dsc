@@ -36,6 +36,7 @@ def parse_inputs():
             '/home/mariano/data/DiceProject/msseg',
             '/home/mariano/data/DiceProject/longitudinal',
             '/home/mariano/data/DiceProject/cross-sectional',
+            # '/home/mariano/data/DiceProject/enhancing',
         ],
         help='Option to define the folders for each ask with all the patients.'
     )
@@ -67,6 +68,11 @@ def parse_inputs():
         '--sgd',
         dest='sgd', default=False, action='store_true',
         help='Option to use SGD instead of Adam'
+    )
+    parser.add_argument(
+        '--batched',
+        dest='batched', default=False, action='store_true',
+        help='Option to run the main where every batch is used as validation'
     )
     options = vars(parser.parse_args())
 
@@ -144,7 +150,7 @@ def get_images(d_path, image_tags=None, verbose=0):
 
 def train(
         d_path, net, model_name, train_dicts, test_dicts, negative_ratio=1,
-        log_file=None, verbose=0
+        log_file=None, batch_file=None, verbose=0
 ):
     """
 
@@ -155,6 +161,7 @@ def train(
     :param test_dicts:
     :param negative_ratio:
     :param log_file:
+    :param batch_file:
     :param verbose:
     :return:
     """
@@ -226,11 +233,12 @@ def train(
 
     net.fit(
         train_loader, val_loader, test_loader, epochs=epochs,
-        log_file=log_file
+        log_file=log_file, batch_file=batch_file
     )
     net.save_model(os.path.join(d_path, model_name))
-    net.save_first(os.path.join(d_path, 'first_' + model_name))
-    net.save_last(os.path.join(d_path, 'last_' + model_name))
+    if batch_file is None:
+        net.save_first(os.path.join(d_path, 'first_' + model_name))
+        net.save_last(os.path.join(d_path, 'last_' + model_name))
 
 
 """
@@ -339,10 +347,117 @@ def main(verbose=2):
 
         for nr in ratios:
             for loss in losses:
-                analyse_results(d_path, loss, nr, list(range(n_folds)), lr)
+                analyse_results(
+                    d_path, 'unet', loss, nr, list(range(n_folds)), lr
+                )
                 for i in range(n_folds):
-                    analyse_results(d_path, loss, nr, i, lr)
+                    analyse_results(d_path, 'unet', loss, nr, i, lr)
+
+
+def batch_main(verbose=2):
+    # Init
+    torch.backends.cudnn.deterministic = True
+    # torch.backends.cudnn.benchmark = False
+    d_path = '/home/mariano/data/DiceProject/cross-sectional'
+    n_folds = 5
+    c = color_codes()
+    options = parse_inputs()
+
+    print(
+        '{:}[{:}] {:}<Segmentation pipeline>{:}'.format(
+            c['c'], strftime("%H:%M:%S"), c['y'], c['nc']
+        )
+    )
+
+    # Random seeds. These are hard coded to avoid issues if the script crashes.
+    # A more elegant solution would be to create a "seed file", which is
+    # instantiated on the first run and then it's checked if the script end-s.
+    # Might do it "later".
+    seeds = [42, 80702, 74794, 62021, 48497]
+    losses = [
+        'xent', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
+        'focal_w1', 'focal_w2', 'new'
+    ]
+    optim = 'sgd' if options['sgd'] else 'adam'
+    # ratios = [0, 1, 2, 3]
+    ratios = [0, 1]
+    lr = options['lr']
+    for test_n, seed in enumerate(seeds):
+        for nr in ratios:
+            print(
+                '{:}[{:}] {:}Starting batch cross-validation {:d}{:}'.format(
+                    c['c'], strftime("%H:%M:%S"), c['g'], test_n,
+                    c['nc']
+                )
+            )
+            np.random.seed(seed)
+            cross_seeds = np.random.randint(0, 10000, n_folds)
+
+            patient_dicts, n_images = get_images(d_path)
+            n_patients = len(patient_dicts)
+
+            for i, seed_i in enumerate(cross_seeds):
+                for loss in losses:
+                    np.random.seed(seed_i)
+                    torch.manual_seed(seed_i)
+                    print(
+                        '{:}Starting fold {:} ({:}) {:} - {:d} '
+                        '{:}[ratio {:d} - {:} lr {:.0e}]{:}'.format(
+                            c['c'], c['g'] + str(i) + c['nc'] + c['y'],
+                            loss, c['nc'] + d_path, seed, c['g'], nr,
+                            optim, lr, c['nc']
+                        )
+                    )
+
+                    model_name = 'unet-batch-{:}.nr{:d}.s{:d}.n{:d}.' \
+                                 '{:}-lr{:.0e}.pt'
+                    model_name = model_name.format(
+                        loss, nr, seed, i, optim, lr
+                    )
+                    net = SimpleUNet(
+                        n_images=n_images, base_loss=loss,
+                        lr=lr, optimiser=optim
+                    )
+
+                    try:
+                        net.load_model(os.path.join(d_path, model_name))
+                    except IOError:
+                        # Training
+                        test = list(range(i, n_patients, n_folds))
+                        training = [
+                            patient_dicts[t]
+                            for t in range(len(patient_dicts))
+                            if t not in test
+                        ]
+                        testing = [patient_dicts[t] for t in test]
+
+                        csv_name = 'unet-batch-{:}.nr{:d}.s{:d}.n{:d}' \
+                                   '.{:}-lr{:.0e}.csv'
+
+                        with open(
+                                os.path.join(d_path, csv_name.format(
+                                    loss, nr, seed, i, optim, lr
+                                )), 'w'
+                        ) as csvfile:
+                            csvwriter = csv.writer(csvfile)
+                            train(
+                                d_path, net, model_name, training, testing,
+                                negative_ratio=nr, batch_file=csvwriter,
+                                verbose=verbose
+                            )
+
+    for nr in ratios:
+        for loss in losses:
+            analyse_results(
+                d_path, 'unet-batch', loss, nr, list(range(n_folds)), lr
+            )
+            for i in range(n_folds):
+                analyse_results(d_path, 'unet-batch', loss, nr, i, lr)
 
 
 if __name__ == '__main__':
-    main()
+    options = parse_inputs()
+    if options['batched']:
+        batch_main()
+    else:
+        main()

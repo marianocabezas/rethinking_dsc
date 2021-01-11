@@ -122,6 +122,7 @@ class BaseModel(nn.Module):
                 if self.training:
                     batch_loss.backward()
                     self.optimizer_alg.step()
+                    self.batch_update(batch_i, len(data))
 
             else:
                 # Validation losses (applied to the validation data)
@@ -134,8 +135,6 @@ class BaseModel(nn.Module):
                     for l_f, l in zip(self.val_functions, batch_losses)
                 ])
                 mid_losses.append([loss.tolist() for loss in batch_losses])
-
-            self.batch_update(batch_i, len(data))
 
             # It's important to compute the global loss in both cases.
             loss_value = batch_loss.tolist()

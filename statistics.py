@@ -151,29 +151,50 @@ def analyse_results(path, loss, ratio, fold, lr):
 
     final_dict = {}
     for key in keys[1:-1]:
-        metrics = np.stack([metrics[key] for metrics in dicts])
+        metrics = np.stack([metrics[key] for metrics in final_dict], axis=0)
         final_dict['min_' + key] = np.min(metrics, axis=0)
         final_dict['mean_' + key] = np.mean(metrics, axis=0)
         final_dict['max_' + key] = np.max(metrics, axis=0)
 
     x = range(len(final_dict['min_train_dsc']))
-    y = [
+    y_dsc = [
         final_dict['mean_train_dsc'], final_dict['mean_val_dsc'],
-        final_dict['mean_test_dsc'], final_dict['mean_train_fn'],
+        final_dict['mean_test_dsc']
+    ]
+    y_fn = [final_dict['mean_train_fn'],
         final_dict['mean_val_fn'], final_dict['mean_test_fn'],
     ]
-    yinf = [
+    yinf_dsc = [
         final_dict['min_train_dsc'], final_dict['min_val_dsc'],
-        final_dict['min_test_dsc'], final_dict['min_train_fn'],
+        final_dict['min_test_dsc']
+    ]
+    yinf_fn = [
+        final_dict['min_train_fn'],
         final_dict['min_val_fn'], final_dict['min_test_fn']
     ]
-    ysup = [
+    ysup_dsc = [
         final_dict['max_train_dsc'], final_dict['max_val_dsc'],
-        final_dict['max_test_dsc'], final_dict['max_train_fn'],
+        final_dict['max_test_dsc']
+    ]
+    ysup_fn = [
+        final_dict['max_train_fn'],
         final_dict['max_val_fn'], final_dict['max_test_fn']
     ]
     save_bands(
-        x, y, yinf, ysup, '{:}'.format(loss), path, ymin=0, ymax=1,
+        x, y_dsc, yinf_dsc, ysup_dsc, '{:}-dsc'.format(loss), path, ymin=0, ymax=1,
+        ylabel='DSC metric', legend=[
+            'Patch training DSC', 'Image training DSC', 'Image testing DSC'
+        ]
+    )
+    save_bands(
+        x, y_fn, yinf_fn, ysup_fn, '{:}-fn'.format(loss), path, ymin=0, ymax=1,
+        ylabel='FN metric', legend=[
+            'Patch training FN', 'Image training FN', 'Image testing FN'
+        ]
+    )
+    save_bands(
+        x, y_dsc + y_fn, yinf_dsc + yinf_fn, ysup_dsc + ysup_fn,
+        '{:}'.format(loss), path, ymin=0, ymax=1,
         legend=[
             'Patch training DSC', 'Image training DSC', 'Image testing DSC',
             'Patch training FN', 'Image training FN', 'Image testing FN'

@@ -1,5 +1,9 @@
+import csv
 import os
 import time
+from operator import and_
+from functools import reduce
+import matplotlib.pyplot as plt
 import numpy as np
 from nibabel import load as load_nii
 from skimage.measure import label as bwlabeln
@@ -75,6 +79,99 @@ def analyse_lesions(d_path, verbose=0):
                 brain_voxels
             )
         )
+
+
+def check_tags(filename, tags):
+    check = [tag in filename for tag in tags]
+    return reduce(and_, check)
+
+
+def save_bands(
+        x, y, yinf, ysup, suffix, path,
+        xmin=None, xmax=None, ymin=0, ymax=1,
+        xlabel='Epoch', ylabel='Metric'
+):
+    # Init
+    if xmin is None:
+        xmin = np.min(x)
+    if xmax is None:
+        xmax = np.max(x)
+    if ymin is None:
+        ymin = np.min(yinf)
+    if ymax is None:
+        ymax = np.max(ysup)
+
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    plt.title('Band plot (train vs validation vs test)'.format(xlabel, ylabel))
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+
+    colomap = ['b', 'g', 'c', 'r', 'm', 'y']
+
+    for yi, yinfi, ysupi, ci in zip(y, yinf, ysup, colomap):
+        ax.plot(x, yi, '-', color=ci)
+        ax.fill_between(x, yinfi, ysupi, alpha=0.2, color=ci)
+
+    ax.set_xlim(xmin=xmin, xmax=xmax)
+    ax.set_ylim(ymin=ymin, ymax=ymax)
+
+    plt.savefig(os.path.join(
+        path, 'bands_{:}.png'.format(suffix)
+    ))
+    plt.close()
+
+
+def analyse_results(path, loss, ratio, fold, lr):
+    tags = [
+        'unet-{:}'.format(loss), 'nr{:d}'.format(ratio), 'n{:d}'.format(fold),
+        'lr{:.0e}'.format(lr)
+    ]
+    csv_files = [
+        file for file in os.listdir(path)
+        if file.endswith('.csv') and check_tags(file, tags)
+    ]
+    dicts = []
+    keys = []
+    for file in csv_files:
+        csv_name = os.path.join(path, file)
+        with open(csv_name) as csv_file:
+            reader = csv.reader(csv_file)
+            keys = next(reader)
+            results_dict = {}
+            for key in keys[1:-1]:
+                results_dict[key] = []
+            for row in reader:
+                for key, data in zip(keys[1:-1], row[1:-1]):
+                    results_dict[key].append(float(data))
+        dicts.append(results_dict)
+
+    final_dict = {}
+    for key in keys[1:-1]:
+        metrics = np.stack([metrics[key] for metrics in dicts])
+        final_dict['min_' + key] = np.min(metrics, axis=0)
+        final_dict['mean_' + key] = np.mean(metrics, axis=0)
+        final_dict['max_' + key] = np.max(metrics, axis=0)
+
+    x = range(len(final_dict['min_train_dsc']))
+    y = [
+        final_dict['mean_train_dsc'], final_dict['mean_val_dsc'],
+        final_dict['mean_test_dsc']
+    ]
+    yinf = [
+        final_dict['min_train_dsc'], final_dict['min_val_dsc'],
+        final_dict['min_test_dsc']
+    ]
+    ysup = [
+        final_dict['max_train_dsc'], final_dict['max_val_dsc'],
+        final_dict['max_test_dsc']
+    ]
+    save_bands(
+        x, y, yinf, ysup, '{:}-dsc'.format(loss), path, ymin=0, ymax=1,
+        ylabel='DSC metric'
+    )
+
+    return final_dict
 
 
 """

@@ -358,7 +358,7 @@ def batch_main(verbose=2):
     # Init
     torch.backends.cudnn.deterministic = True
     # torch.backends.cudnn.benchmark = False
-    d_path = '/home/mariano/data/DiceProject/msseg'
+    d_path = '/home/mariano/data/DiceProject/longitudinal'
     n_folds = 5
     c = color_codes()
     options = parse_inputs()

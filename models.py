@@ -411,10 +411,12 @@ class BaseModel(nn.Module):
             loss_val, mid_val = self.validate(
                 self.val_loader, 0
             )
-
             _, mid_tst = self.validate(
                 self.test_loader, 0
             )
+
+            self.train()
+
             self.batch_file.writerow(
                 [
                     'Epoch {:03d} - Batch {:04d}'.format(self.epoch, batch),

@@ -309,11 +309,18 @@ def main(verbose=2):
                             net.load_model(os.path.join(d_path, model_name))
                         except IOError:
                             # Training
-                            ini_test = n_patients * i // n_folds
-                            end_test = n_patients * (i + 1) // n_folds
-                            training = patient_dicts[end_test:] + \
-                                patient_dicts[:ini_test]
-                            testing = patient_dicts[ini_test:end_test]
+                            test = list(range(i, n_patients, n_folds))
+                            # ini_test = n_patients * i // n_folds
+                            # end_test = n_patients * (i + 1) // n_folds
+                            # training = patient_dicts[end_test:] + \
+                            #     patient_dicts[:ini_test]
+                            # testing = patient_dicts[ini_test:end_test]
+                            training = [
+                                patient_dicts[t]
+                                for t in range(len(patient_dicts))
+                                if t not in test
+                            ]
+                            testing = [patient_dicts[t] for t in test]
 
                             csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
                                        '.{:}-lr{:.0e}.csv'

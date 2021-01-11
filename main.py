@@ -12,6 +12,7 @@ from utils import color_codes, get_dirs, get_int
 from utils import get_mask, get_normalised_image
 from utils import time_to_string, find_file
 from models import SimpleUNet
+from statistics import analyse_results
 from datasets import LesionCroppingDataset, LesionDataset
 
 """
@@ -275,59 +276,59 @@ def main(verbose=2):
                         c['nc']
                     )
                 )
-                np.random.seed(seed)
-                cross_seeds = np.random.randint(0, 10000, n_folds)
+                # np.random.seed(seed)
+                # cross_seeds = np.random.randint(0, 10000, n_folds)
 
                 patient_dicts, n_images = get_images(d_path)
                 n_patients = len(patient_dicts)
 
-                for i, seed_i in enumerate(cross_seeds):
-                    for loss in losses:
-                        np.random.seed(seed_i)
-                        torch.manual_seed(seed_i)
-                        print(
-                            '{:}Starting fold {:} ({:}) {:} - {:d} '
-                            '{:}[ratio {:d} - {:} lr {:.0e}]{:}'.format(
-                                c['c'], c['g'] + str(i) + c['nc'] + c['y'],
-                                loss, c['nc'] + d_path, seed, c['g'], nr,
-                                optim, lr, c['nc']
+                # for i, seed_i in enumerate(cross_seeds):
+                for loss in losses:
+                    np.random.seed(seed)
+                    torch.manual_seed(seed)
+                    print(
+                        '{:}Starting fold {:} ({:}) {:} - {:d} '
+                        '{:}[ratio {:d} - {:} lr {:.0e}]{:}'.format(
+                            c['c'], c['g'] + str(test_n) + c['nc'] + c['y'],
+                            loss, c['nc'] + d_path, seed, c['g'], nr,
+                            optim, lr, c['nc']
+                        )
+                    )
+
+                    model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.' \
+                                 '{:}-lr{:.0e}.pt'
+                    model_name = model_name.format(
+                        loss, nr, seed, test_n, optim, lr
+                    )
+                    net = SimpleUNet(
+                        n_images=n_images, base_loss=loss,
+                        lr=lr, optimiser=optim
+                    )
+
+                    try:
+                        net.load_model(os.path.join(d_path, model_name))
+                    except IOError:
+                        # Training
+                        ini_test = n_patients * test_n // n_folds
+                        end_test = n_patients * (test_n + 1) // n_folds
+                        training = patient_dicts[end_test:] + \
+                            patient_dicts[:ini_test]
+                        testing = patient_dicts[ini_test:end_test]
+
+                        csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
+                                   '.{:}-lr{:.0e}.csv'
+
+                        with open(
+                                os.path.join(d_path, csv_name.format(
+                                    loss, nr, seed, test_n, optim, lr
+                                )), 'w'
+                        ) as csvfile:
+                            csvwriter = csv.writer(csvfile)
+                            train(
+                                d_path, net, model_name, training, testing,
+                                negative_ratio=nr, log_file=csvwriter,
+                                verbose=verbose
                             )
-                        )
-
-                        model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.' \
-                                     '{:}-lr{:.0e}.pt'
-                        model_name = model_name.format(
-                            loss, nr, seed, i, optim, lr
-                        )
-                        net = SimpleUNet(
-                            n_images=n_images, base_loss=loss,
-                            lr=lr, optimiser=optim
-                        )
-
-                        try:
-                            net.load_model(os.path.join(d_path, model_name))
-                        except IOError:
-                            # Training
-                            ini_test = n_patients * i // n_folds
-                            end_test = n_patients * (i + 1) // n_folds
-                            training = patient_dicts[end_test:] + \
-                                patient_dicts[:ini_test]
-                            testing = patient_dicts[ini_test:end_test]
-
-                            csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
-                                       '.{:}-lr{:.0e}.csv'
-
-                            with open(
-                                    os.path.join(d_path, csv_name.format(
-                                        loss, nr, seed, i, optim, lr
-                                    )), 'w'
-                            ) as csvfile:
-                                csvwriter = csv.writer(csvfile)
-                                train(
-                                    d_path, net, model_name, training, testing,
-                                    negative_ratio=nr, log_file=csvwriter,
-                                    verbose=verbose
-                                )
 
 
 if __name__ == '__main__':

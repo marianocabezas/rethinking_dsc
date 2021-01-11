@@ -126,10 +126,18 @@ def save_bands(
 
 
 def analyse_results(path, loss, ratio, fold, lr):
-    tags = [
-        'unet-{:}.'.format(loss), 'nr{:d}'.format(ratio), 'n{:d}'.format(fold),
-        'lr{:.0e}'.format(lr)
-    ]
+    if isinstance(fold, list):
+        tags = [
+            'unet-{:}.'.format(loss), 'nr{:d}'.format(ratio),
+            'lr{:.0e}'.format(lr)
+        ]
+        fold_suffix = ''
+    else:
+        tags = [
+            'unet-{:}.'.format(loss), 'nr{:d}'.format(ratio),
+            'n{:d}'.format(fold), 'lr{:.0e}'.format(lr)
+        ]
+        fold_suffix = 'n{:d}'.format(fold)
     csv_files = [
         file for file in os.listdir(path)
         if file.endswith('.csv') and check_tags(file, tags)
@@ -182,20 +190,20 @@ def analyse_results(path, loss, ratio, fold, lr):
         final_dict['max_test_fn']
     ]
     save_bands(
-        x, y_dsc, yinf_dsc, ysup_dsc, '{:}-dsc'.format(loss), path, ymin=0, ymax=1,
-        ylabel='DSC metric', legend=[
+        x, y_dsc, yinf_dsc, ysup_dsc, '{:}-dsc.{:}'.format(loss, fold_suffix),
+        path, ymin=0, ymax=1, ylabel='DSC metric', legend=[
             'Patch training DSC', 'Image training DSC', 'Image testing DSC'
         ]
     )
     save_bands(
-        x, y_fn, yinf_fn, ysup_fn, '{:}-fn'.format(loss), path, ymin=0, ymax=1,
-        ylabel='FN metric', legend=[
+        x, y_fn, yinf_fn, ysup_fn, '{:}-fn.{:}'.format(loss, fold_suffix),
+        path, ymin=0, ymax=1, ylabel='FN metric', legend=[
             'Patch training FN', 'Image training FN', 'Image testing FN'
         ]
     )
     save_bands(
         x, y_dsc + y_fn, yinf_dsc + yinf_fn, ysup_dsc + ysup_fn,
-        '{:}'.format(loss), path, ymin=0, ymax=1,
+        '{:}.{:}'.format(loss, fold_suffix), path, ymin=0, ymax=1,
         legend=[
             'Patch training DSC', 'Image training DSC', 'Image testing DSC',
             'Patch training FN', 'Image training FN', 'Image testing FN'

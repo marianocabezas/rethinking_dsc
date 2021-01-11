@@ -330,6 +330,12 @@ def main(verbose=2):
                                     verbose=verbose
                                 )
 
+        for nr in ratios:
+            for loss in losses:
+                analyse_results(d_path, loss, nr, list(range(n_folds)), lr)
+                for i in range(n_folds):
+                    analyse_results(d_path, loss, nr, i, lr)
+
 
 if __name__ == '__main__':
     main()

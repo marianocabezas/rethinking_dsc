@@ -183,7 +183,7 @@ def dsc_binary_loss(pred, target):
     sum_target = torch.sum(target, dim=1).type(torch.float32).to(pred.device)
 
     dsc_k = intersection / (sum_pred + sum_target)
-    dsc_k[torch.isnan(dsc_k)] = 0
+    dsc_k = dsc_k[torch.logical_not(torch.isnan(dsc_k))]
     dsc = 1 - torch.mean(dsc_k)
 
     return torch.clamp(dsc, 0., 1.)
@@ -199,7 +199,7 @@ def tp_binary_loss(pred, target):
     sum_target = torch.sum(target, dim=1).type(torch.float32).to(pred.device)
 
     tp_k = intersection / sum_target
-    tp_k[torch.isnan(tp_k)] = 0
+    tp_k = tp_k[torch.logical_not(torch.isnan(tp_k))]
     tp = 1 - torch.mean(tp_k)
 
     return torch.clamp(tp, 0., 1.)
@@ -217,7 +217,7 @@ def tn_binary_loss(pred, target):
     ).type(torch.float32).to(pred.device)
 
     tn_k = intersection / sum_target
-    tn_k[torch.isnan(tn_k)] = 0
+    tn_k = tn_k[torch.logical_not(torch.isnan(tn_k))]
     tn = 1 - torch.mean(tn_k)
 
     return torch.clamp(tn, 0., 1.)

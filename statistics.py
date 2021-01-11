@@ -89,7 +89,7 @@ def check_tags(filename, tags):
 def save_bands(
         x, y, yinf, ysup, suffix, path,
         xmin=None, xmax=None, ymin=0, ymax=1,
-        xlabel='Epoch', ylabel='Metric'
+        xlabel='Epoch', ylabel='Metric', legend=None
 ):
     # Init
     if xmin is None:
@@ -115,6 +115,9 @@ def save_bands(
 
     ax.set_xlim(xmin=xmin, xmax=xmax)
     ax.set_ylim(ymin=ymin, ymax=ymax)
+
+    if legend is not None:
+        plt.legend(legend)
 
     plt.savefig(os.path.join(
         path, 'bands_{:}.png'.format(suffix)
@@ -156,22 +159,26 @@ def analyse_results(path, loss, ratio, fold, lr):
     x = range(len(final_dict['min_train_dsc']))
     y = [
         final_dict['mean_train_dsc'], final_dict['mean_val_dsc'],
-        final_dict['mean_test_dsc']
+        final_dict['mean_test_dsc'], final_dict['mean_train_fn'],
+        final_dict['mean_val_fn'], final_dict['mean_test_fn'],
     ]
     yinf = [
         final_dict['min_train_dsc'], final_dict['min_val_dsc'],
-        final_dict['min_test_dsc']
+        final_dict['min_test_dsc'], final_dict['min_train_fn'],
+        final_dict['min_val_fn'], final_dict['min_test_fn']
     ]
     ysup = [
         final_dict['max_train_dsc'], final_dict['max_val_dsc'],
-        final_dict['max_test_dsc']
+        final_dict['max_test_dsc'], final_dict['max_train_fn'],
+        final_dict['max_val_fn'], final_dict['max_test_fn']
     ]
     save_bands(
-        x, y, yinf, ysup, '{:}-dsc'.format(loss), path, ymin=0, ymax=1,
-        ylabel='DSC metric'
+        x, y, yinf, ysup, '{:}'.format(loss), path, ymin=0, ymax=1,
+        legend=[
+            'Patch training DSC', 'Image training DSC', 'Image testing DSC',
+            'Patch training FN', 'Image training FN', 'Image testing FN'
+        ]
     )
-
-    return final_dict
 
 
 """

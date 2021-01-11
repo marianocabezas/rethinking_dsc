@@ -363,7 +363,7 @@ class BaseModel(nn.Module):
                     )
             )
 
-    def validate(self, data, best_loss):
+    def validate(self, data, best_loss=None):
         with torch.no_grad():
             self.t_val = time.time()
             self.eval()
@@ -371,19 +371,21 @@ class BaseModel(nn.Module):
                 data, False
             )
         # Mid losses check
-        losses_s = [
-            '\033[36m{:8.5f}\033[0m'.format(l) if bl > l
-            else '{:8.5f}'.format(l) for bl, l in zip(
-                best_loss, mid_losses
-            )
-        ]
-        best_loss = [
-            l if bl > l else bl for bl, l in zip(
-                best_loss, mid_losses
-            )
-        ]
-
-        return loss, best_loss, losses_s, mid_losses
+        if best_loss is not None:
+            losses_s = [
+                '\033[36m{:8.5f}\033[0m'.format(l) if bl > l
+                else '{:8.5f}'.format(l) for bl, l in zip(
+                    best_loss, mid_losses
+                )
+            ]
+            best_loss = [
+                l if bl > l else bl for bl, l in zip(
+                    best_loss, mid_losses
+                )
+            ]
+            return loss, best_loss, losses_s, mid_losses
+        else:
+            return loss, mid_losses
 
     def epoch_update(self, epochs):
         """
@@ -404,15 +406,13 @@ class BaseModel(nn.Module):
         """
         if self.batch_file is not None:
             # Then we validate and check all the losses
-            loss_tr, _, _, mid_tr = self.validate(
-                self.train_loader, 0
-            )
+            loss_tr, mid_tr = self.validate(self.train_loader)
 
-            loss_val, _, _, mid_val = self.validate(
+            loss_val, mid_val = self.validate(
                 self.val_loader, 0
             )
 
-            _, _, _, mid_tst = self.validate(
+            _, mid_tst = self.validate(
                 self.test_loader, 0
             )
             self.batch_file.writerow(

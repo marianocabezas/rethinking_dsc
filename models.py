@@ -408,12 +408,8 @@ class BaseModel(nn.Module):
             # Then we validate and check all the losses
             loss_tr, mid_tr = self.validate(self.train_loader)
 
-            loss_val, mid_val = self.validate(
-                self.val_loader, 0
-            )
-            _, mid_tst = self.validate(
-                self.test_loader, 0
-            )
+            loss_val, mid_val = self.validate(self.val_loader)
+            _, mid_tst = self.validate(self.test_loader)
 
             self.train()
 

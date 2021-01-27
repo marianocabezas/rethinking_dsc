@@ -129,10 +129,10 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
 
 
 def new_loss(pred, target, weight_bg=None, weight_fg=None):
-    return PrincipledLoss.apply(pred, target, weight_bg, weight_fg)
+    return WeightedLoss.apply(pred, target, weight_bg, weight_fg)
 
 
-class PrincipledLoss(torch.autograd.Function):
+class WeightedLoss(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx, pred, target, weight_bg=None, weight_fg=None):

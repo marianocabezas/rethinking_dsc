@@ -33,8 +33,6 @@ def get_images(d_path, image_tags=None, verbose=0):
     patient_dicts = []
     test_start = time.time()
 
-    n_images = 0
-
     for pi, p in enumerate(patients):
         p_path = os.path.join(d_path, p)
         tests = len(patients) - pi
@@ -58,20 +56,18 @@ def get_images(d_path, image_tags=None, verbose=0):
         brain = get_mask(os.path.join(p_path, 'brain.nii.gz'))
         lesion = load_nii(os.path.join(p_path, 'lesion.nii.gz')).get_fdata()
         lesion = (lesion == 1).astype(np.uint8)
-        images = [get_normalised_image(file, brain) for file in files]
-        n_images = len(images)
         p_dict = {
-            'name': p,
             'brain': brain,
             'lesion': lesion,
-            'images': np.stack(images, axis=0),
+            'images': np.stack([brain, lesion], axis=0),
         }
         patient_dicts.append(p_dict)
 
     if verbose > 0:
         print('{:}All patients loaded'.format(c['clr']))
 
-    return patient_dicts, n_images
+    return patient_dicts
+
 
 def analyse_lesions(d_path, verbose=0):
     # Init

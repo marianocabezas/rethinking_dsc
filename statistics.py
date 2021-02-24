@@ -10,9 +10,67 @@ from skimage.measure import label as bwlabeln
 import torch
 from torch.utils.data import DataLoader
 from datasets import LesionCroppingDataset
-from main import get_images, parse_inputs
+from utils import find_file, get_mask, get_normalised_image
 from utils import color_codes, get_dirs, get_int, time_to_string
 
+
+def get_images(d_path, image_tags=None, verbose=0):
+    """
+    Function to get all the images from a folder. For training, files are
+    loaded from the loo_dir, which is the one used for a leave-one-out train
+    and for testing val_dir is used.
+    :param d_path:
+    :param image_tags:
+    :param verbose: Verbosity level.
+    :return:
+    """
+    c = color_codes()
+    if image_tags is None:
+        image_tags = ['t1', 'flair', 'pd', 't2']
+    tag_string = '(' + '|'.join(image_tags) + ')'
+    patients = sorted(get_dirs(d_path), key=get_int)
+    patient_dicts = []
+    test_start = time.time()
+
+    n_images = 0
+
+    for pi, p in enumerate(patients):
+        p_path = os.path.join(d_path, p)
+        tests = len(patients) - pi
+        if verbose > 0:
+            test_elapsed = time.time() - test_start
+            test_eta = tests * test_elapsed / (pi + 1)
+            print(
+                '{:}Loading patient {:} ({:d}/{:d}) '
+                '{:} ETA {:}'.format(
+                    c['clr'], p, pi + 1, len(patients),
+                    time_to_string(test_elapsed),
+                    time_to_string(test_eta),
+                ), end='\r'
+            )
+
+        find_file('(' + '|'.join(image_tags) + ')', p_path)
+        files = [
+            os.path.join(p_path, file) for file in os.listdir(p_path)
+            if not os.path.isdir(file) and re.search(tag_string, file)
+        ]
+        brain = get_mask(os.path.join(p_path, 'brain.nii.gz'))
+        lesion = load_nii(os.path.join(p_path, 'lesion.nii.gz')).get_fdata()
+        lesion = (lesion == 1).astype(np.uint8)
+        images = [get_normalised_image(file, brain) for file in files]
+        n_images = len(images)
+        p_dict = {
+            'name': p,
+            'brain': brain,
+            'lesion': lesion,
+            'images': np.stack(images, axis=0),
+        }
+        patient_dicts.append(p_dict)
+
+    if verbose > 0:
+        print('{:}All patients loaded'.format(c['clr']))
+
+    return patient_dicts, n_images
 
 def analyse_lesions(d_path, verbose=0):
     # Init
@@ -81,9 +139,8 @@ def analyse_lesions(d_path, verbose=0):
                 )
             )
 
-    options = parse_inputs()
-    batch_size = options['batch_size']
-    patch_size = options['patch_size']
+    batch_size = 8
+    patch_size = 32
     overlap = patch_size // 2
 
     train_dicts, _ = get_images(d_path)

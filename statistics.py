@@ -154,7 +154,7 @@ def analyse_lesions(d_path, verbose=0):
         y_flat = y.flatten(1)
         b_flat = brain.flatten(1)
 
-        print(torch.sum(y, dim=1), torch.sum(brain, dim=1))
+        print(torch.sum(y), torch.sum(brain))
 
         batch_voxels += torch.sum(y)
         batch_brain_voxels += torch.sum(brain)

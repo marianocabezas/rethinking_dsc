@@ -21,7 +21,7 @@ def analyse_lesions(d_path, verbose=0):
     n_cases = len(patients)
     eval_start = time.time()
 
-    if verbose > 0:
+    if verbose > 1:
         print(''.join(['-'] * 58))
         print(
             '{:}{:^18}||{:^8}|{:^8}|{:^8}||{:^9}|'.format(

@@ -153,6 +153,9 @@ def analyse_lesions(d_path, verbose=0):
     for brain, y in train_loader:
         y_flat = y.flatten(1)
         b_flat = brain.flatten(1)
+
+        print(y_flat, b_flat)
+
         batch_voxels += torch.sum(y)
         batch_brain_voxels += torch.sum(brain)
         percent = 100 * torch.sum(y_flat, dim=1) / torch.sum(b_flat, dim=1)

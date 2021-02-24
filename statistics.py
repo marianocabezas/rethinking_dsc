@@ -59,7 +59,7 @@ def get_images(d_path, image_tags=None, verbose=0):
         p_dict = {
             'brain': brain,
             'lesion': lesion,
-            'images': np.stack([brain, lesion], axis=0),
+            'images': np.expand_dims(brain, axis=0),
         }
         patient_dicts.append(p_dict)
 

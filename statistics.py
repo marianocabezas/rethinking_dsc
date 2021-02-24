@@ -7,16 +7,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 from nibabel import load as load_nii
 from skimage.measure import label as bwlabeln
+import torch
+from torch.utils.data import DataLoader
+from datasets import LesionCroppingDataset
+from main import get_images, parse_inputs
 from utils import color_codes, get_dirs, get_int, time_to_string
 
 
 def analyse_lesions(d_path, verbose=0):
     # Init
     c = color_codes()
+    batch_percent = []
     voxel_percent = []
     voxels = 0
+    batch_voxels = 0
     lesions = 0
     brain_voxels = 0
+    batch_brain_voxels = 0
     patients = sorted(get_dirs(d_path))
     n_cases = len(patients)
     eval_start = time.time()
@@ -73,19 +80,53 @@ def analyse_lesions(d_path, verbose=0):
                     brain_voxels_i
                 )
             )
+
+    options = parse_inputs()
+    batch_size = options['batch_size']
+    patch_size = options['patch_size']
+    overlap = patch_size // 2
+
+    train_dicts, _ = get_images(d_path)
+    # Here we'll do the training / validation split...
+    d_train = [t['images'] for t in train_dicts]
+    r_train = [t['brain'] for t in train_dicts]
+    m_train = [t['lesion'] for t in train_dicts]
+
+    # Training
+    if verbose > 1:
+        print('< Training dataset >')
+    train_dataset = LesionCroppingDataset(
+        d_train, m_train, r_train, patch_size=patch_size,
+        overlap=overlap, negative_ratio=0
+    )
+    train_loader = DataLoader(train_dataset, batch_size, True)
+
+    for brain, y in train_loader:
+        y_flat = y.flatten(1)
+        b_flat = brain.flatten(1)
+        batch_voxels += torch.sum(y)
+        batch_brain_voxels += torch.sum(brain)
+        percent = 100 * torch.sum(y_flat, dim=1) / torch.sum(b_flat, dim=1)
+        batch_percent + percent.numpy().tolst()
+
     if verbose > 0:
         print(''.join(['-'] * 86))
         print(
-            '{:}{:^18}||{:^8}|{:^8}|{:^27}||{:^9}||{:^9}'.format(
-                c['clr'], 'Patient', 'Vox', 'Lesions', '%', 'Brain', 'Size'
+            '{:}{:^18}||{:^8}|{:^8}||{:^27}|{:^27}||{:^9}||{:^9}'.format(
+                c['clr'], 'Patient', 'Vox', 'Lesions', '% image',
+                '% batch', 'Brain', 'Size'
             )
         )
         print(
-            '{:}{:<18}||{:8d}|{:8d}|{:7.4f}±{:7.4f}% [{:8.4f}%]|'
+            '{:}{:<18}||{:8d}|{:8d}|'
+            '|{:7.4f}±{:7.4f}% [{:8.4f}%]|{:7.4f}±{:7.4f}% [{:8.4f}%]|'
             '|{:9d}||{:8.4f}'.format(
                 c['clr'], 'Mean',
                 voxels, lesions, np.mean(voxel_percent), np.std(voxel_percent),
-                100 * voxels / brain_voxels, brain_voxels, voxels / lesions
+                100 * voxels / brain_voxels,
+                np.mean(batch_percent), np.std(batch_percent),
+                100 * batch_voxels / batch_brain_voxels,
+                brain_voxels, voxels / lesions
             )
         )
         print(''.join(['-'] * 86))

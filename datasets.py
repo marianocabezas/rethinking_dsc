@@ -100,7 +100,7 @@ class LesionCroppingDataset(Dataset):
     def __init__(
             self,
             cases, labels, masks, patch_size=32, overlap=0, balanced=True,
-            negative_ratio=1
+            negative_ratio=1, return_brain=False
     ):
         # Init
         data_shape = masks[0].shape
@@ -117,6 +117,8 @@ class LesionCroppingDataset(Dataset):
         self.masks = masks
         self.labels = labels
         self.cases = cases
+
+        self.return_brain = return_brain
 
         self.ratio = negative_ratio
 
@@ -166,7 +168,11 @@ class LesionCroppingDataset(Dataset):
         case = self.cases[case_idx]
         none_slice = (slice(None, None),)
         # Patch "extraction".
-        data = case[none_slice + slice_i].astype(np.float32)
+        if self.return_brain:
+            brain = self.masks[case_idx].astype(np.uint8)
+            data = np.expand_dims(brain[slice_i], 0)
+        else:
+            data = case[none_slice + slice_i].astype(np.float32)
         labels = self.labels[case_idx].astype(np.uint8)
 
         # We expand the labels to have 1 "channel". This is tricky depending

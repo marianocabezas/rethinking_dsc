@@ -322,8 +322,8 @@ def main(verbose=1):
     c = color_codes()
     path_list = [
         '/home/mariano/data/DiceProject/longitudinal',
-        '/home/mariano/data/DiceProject/msseg',
         '/home/mariano/data/DiceProject/wmh',
+        '/home/mariano/data/DiceProject/msseg',
         '/home/mariano/data/DiceProject/lit',
         '/home/mariano/data/DiceProject/cross-sectional',
     ]

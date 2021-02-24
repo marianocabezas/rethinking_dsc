@@ -160,17 +160,17 @@ def analyse_lesions(d_path, verbose=0):
         batch_percent += percent.numpy().tolist()
 
     if verbose > 0:
-        print(''.join(['-'] * 86))
+        print(''.join(['-'] * 117))
         print(
-            '{:}{:^18}||{:^8}|{:^8}||{:^27}|{:^27}||{:^9}||{:^9}'.format(
+            '{:}{:^18}||{:^8}|{:^8}||{:^27}|{:^27}||{:^9}||{:^9}|'.format(
                 c['clr'], 'Patient', 'Vox', 'Lesions', '% image',
                 '% batch', 'Brain', 'Size'
             )
         )
         print(
             '{:}{:<18}||{:8d}|{:8d}|'
-            '|{:7.4f}±{:7.4f}% [{:8.4f}%]|{:7.4f}±{:7.4f}% [{:8.4f}%]|'
-            '|{:9d}||{:8.4f}'.format(
+            '|{:7.4f}±{:7.4f}% [{:7.4f}%]|{:7.4f}±{:7.4f}% [{:7.4f}%]|'
+            '|{:9d}||{:8.4f}|'.format(
                 c['clr'], 'Mean',
                 voxels, lesions, np.mean(voxel_percent), np.std(voxel_percent),
                 100 * voxels / brain_voxels,
@@ -179,7 +179,7 @@ def analyse_lesions(d_path, verbose=0):
                 brain_voxels, voxels / lesions
             )
         )
-        print(''.join(['-'] * 86))
+        print(''.join(['-'] * 117))
 
 
 def check_tags(filename, tags):

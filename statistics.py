@@ -13,6 +13,7 @@ from utils import color_codes, get_dirs, get_int, time_to_string
 def analyse_lesions(d_path, verbose=0):
     # Init
     c = color_codes()
+    voxel_percent = []
     voxels = 0
     lesions = 0
     brain_voxels = 0
@@ -58,10 +59,11 @@ def analyse_lesions(d_path, verbose=0):
         voxels_i = np.sum(lesion_mask)
         voxels += voxels_i
         labels = bwlabeln(lesion_mask)
-        lesions_i = np.max(labels)
+        lesions_i = len(np.unique(labels)) - 1
         lesions += lesions_i
         brain_voxels_i = np.sum(brain_mask)
         brain_voxels += brain_voxels_i
+        voxel_percent.append(100 * voxels_i / brain_voxels_i)
 
         if verbose > 1:
             print(
@@ -73,10 +75,10 @@ def analyse_lesions(d_path, verbose=0):
             )
     if verbose > 0:
         print(
-            '{:}{:<18}||{:8d}|{:8d}|{:7.4f}%||{:9d}|'.format(
+            '{:}{:<18}||{:8d}|{:8d}|{:7.4f}±({:7.4f})% [{:7.4f}%]||{:9d}|'.format(
                 c['clr'], 'Mean',
-                voxels, lesions, 100 * voxels / brain_voxels,
-                brain_voxels
+                voxels, lesions, np.mean(voxel_percent), np.std(voxel_percent),
+                100 * voxels / brain_voxels, brain_voxels
             )
         )
 

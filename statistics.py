@@ -74,6 +74,7 @@ def analyse_lesions(d_path, verbose=0):
                 )
             )
     if verbose > 0:
+        print(''.join(['-'] * 85))
         print(
             '{:}{:^18}||{:^8}|{:^8}|{:^27}||{:^9}||{:^8}'.format(
                 c['clr'], 'Patient', 'Vox', 'Lesions', '%', 'Brain', 'Avg. size'

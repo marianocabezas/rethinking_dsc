@@ -157,8 +157,7 @@ def analyse_lesions(d_path, verbose=0):
         batch_voxels += torch.sum(y)
         batch_brain_voxels += torch.sum(brain)
         percent = 100 * torch.sum(y_flat, dim=1) / torch.sum(b_flat, dim=1)
-        print(percent.numpy().tolist())
-        batch_percent + percent.numpy().tolist()
+        batch_percent += percent.numpy().tolist()
 
     if verbose > 0:
         print(''.join(['-'] * 86))

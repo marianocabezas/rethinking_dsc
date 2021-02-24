@@ -170,7 +170,7 @@ def analyse_lesions(d_path, verbose=0):
         print(
             '{:}{:<18}||{:8d}|{:8d}|'
             '|{:7.4f}±{:7.4f}% [{:7.4f}%]|{:7.4f}±{:7.4f}% [{:7.4f}%]|'
-            '|{:9d}||{:8.4f}|'.format(
+            '|{:9d}||{:9.4f}|'.format(
                 c['clr'], 'Mean',
                 voxels, lesions, np.mean(voxel_percent), np.std(voxel_percent),
                 100 * voxels / brain_voxels,
@@ -326,6 +326,7 @@ def main(verbose=1):
         '/home/mariano/data/DiceProject/msseg',
         '/home/mariano/data/DiceProject/lit',
         '/home/mariano/data/DiceProject/cross-sectional',
+        '/home/mariano/data/DiceProject/enhancing',
     ]
     for d_path in path_list:
         print(''.join(['-'] * 58))

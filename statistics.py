@@ -321,12 +321,12 @@ def main(verbose=1):
     # Init
     c = color_codes()
     path_list = [
+        '/home/mariano/data/DiceProject/enhancing',
         '/home/mariano/data/DiceProject/longitudinal',
         '/home/mariano/data/DiceProject/wmh',
         '/home/mariano/data/DiceProject/msseg',
         '/home/mariano/data/DiceProject/lit',
         '/home/mariano/data/DiceProject/cross-sectional',
-        '/home/mariano/data/DiceProject/enhancing',
     ]
     for d_path in path_list:
         print(''.join(['-'] * 58))

@@ -140,7 +140,7 @@ def analyse_lesions(d_path, verbose=0):
     patch_size = 32
     overlap = patch_size // 2
 
-    train_dicts, _ = get_images(d_path)
+    train_dicts = get_images(d_path)
     # Here we'll do the training / validation split...
     d_train = [t['images'] for t in train_dicts]
     r_train = [t['brain'] for t in train_dicts]

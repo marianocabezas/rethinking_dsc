@@ -75,10 +75,16 @@ def analyse_lesions(d_path, verbose=0):
             )
     if verbose > 0:
         print(
-            '{:}{:<18}||{:8d}|{:8d}|{:7.4f}±({:7.4f})% [{:7.4f}%]||{:9d}|'.format(
+            '{:}{:^18}||{:^8}|{:^8}|{:^27}||{:^9}||{:^8}'.format(
+                c['clr'], 'Patient', 'Vox', 'Lesions', '%', 'Brain', 'Avg. size'
+            )
+        )
+        print(
+            '{:}{:<18}||{:8d}|{:8d}|{:7.4f}±{:7.4f}% [{:7.4f}%]|'
+            '|{:9d}||{:8.4f}'.format(
                 c['clr'], 'Mean',
                 voxels, lesions, np.mean(voxel_percent), np.std(voxel_percent),
-                100 * voxels / brain_voxels, brain_voxels
+                100 * voxels / brain_voxels, brain_voxels, voxels / lesions
             )
         )
 

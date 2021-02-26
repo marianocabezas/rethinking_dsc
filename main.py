@@ -267,9 +267,12 @@ def main(verbose=2):
     # instantiated on the first run and then it's checked if the script end-s.
     # Might do it "later".
     seeds = [42, 80702, 74794, 62021, 48497]
+    # losses = [
+    #     'xent', 'xent_w', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
+    #     'focal_w1', 'focal_w2', 'new'
+    # ]
     losses = [
-        'xent', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
-        'focal_w1', 'focal_w2', 'new'
+        'xent', 'gdsc_b', 'dsc', 'mixed', 'focal_w1', 'focal_w2', 'new'
     ]
     optim = 'sgd' if options['sgd'] else 'adam'
     # ratios = [0, 1, 2, 3]
@@ -374,12 +377,9 @@ def batch_main(verbose=2):
     # instantiated on the first run and then it's checked if the script end-s.
     # Might do it "later".
     seeds = [42, 80702, 74794, 62021, 48497]
-    # losses = [
-    #     'xent', 'xent_w', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
-    #     'focal_w1', 'focal_w2', 'new'
-    # ]
     losses = [
-        'xent', 'gdsc_b', 'dsc', 'mixed', 'focal_w1', 'focal_w2', 'new'
+        'xent', 'xent_w', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
+        'focal_w1', 'focal_w2', 'new'
     ]
     optim = 'sgd' if options['sgd'] else 'adam'
     # ratios = [0, 1, 2, 3]

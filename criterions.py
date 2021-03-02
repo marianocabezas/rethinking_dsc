@@ -26,6 +26,9 @@ def focal_loss(pred, target, alpha=0.25, gamma=2.0):
     m_bg = target == 0
     m_fg = target > 0
 
+    if alpha is None:
+        alpha = float(torch.sum(m_bg)) / torch.numel(target)
+
     alpha_fg = alpha
     alpha_bg = 1 - alpha
     pt_fg = pred[m_fg]
@@ -128,14 +131,14 @@ def gendsc_loss(pred, target, batch=True, w_bg=None, w_fg=None):
     return loss
 
 
-def new_loss(pred, target, weight_bg=None, weight_fg=None):
-    return WeightedLoss.apply(pred, target, weight_bg, weight_fg)
+def new_loss(pred, target, weight_bg=None, weight_fg=None, gamma=2):
+    return WeightedLoss.apply(pred, target, weight_bg, weight_fg, gamma)
 
 
 class WeightedLoss(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx, pred, target, weight_bg=None, weight_fg=None):
+    def forward(ctx, pred, target, weight_bg=None, weight_fg=None, gamma=2):
         m_bg = target == 0
         m_fg = target > 0
         y_hat = torch.sigmoid(pred)
@@ -148,6 +151,7 @@ class WeightedLoss(torch.autograd.Function):
         ctx.save_for_backward(y_hat, target)
         ctx.weight_bg = weight_bg
         ctx.weight_fg = weight_fg
+        ctx.gamma = gamma
 
         loss = gendsc_loss(y_hat, target)
 
@@ -158,8 +162,8 @@ class WeightedLoss(torch.autograd.Function):
 
         pred_y, target = ctx.saved_tensors
 
-        negative = (1 - target) * pred_y ** 2
-        positive = target * (1 - pred_y) ** 2
+        negative = (1 - target) * pred_y ** ctx.gamma
+        positive = target * (1 - pred_y) ** ctx.gamma
         dsigmoid = ctx.weight_bg * negative - ctx.weight_fg * positive
 
         grad_input = grad_output * dsigmoid

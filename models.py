@@ -750,8 +750,11 @@ class SimpleUNet(BaseModel):
             'xent': lambda x, y: F.binary_cross_entropy(
                 torch.sigmoid(x), y.type_as(x).to(x.device)
             ),
-            'xent_w': lambda x, y: focal_loss(
-                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0.75, gamma=0
+            'xent_w': lambda x, y:focal_loss(
+                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=None
+            ),
+            'xent_w2': lambda x, y: focal_loss(
+                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0.75
             ),
             'gdsc': lambda x, y: gendsc_loss(
                 torch.sigmoid(x), y.type_as(x).to(x.device), batch=False
@@ -768,7 +771,7 @@ class SimpleUNet(BaseModel):
                 torch.sigmoid(x), y.type_as(x).to(x.device)
             ),
             'focal': lambda x, y: focal_loss(
-                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0
+                torch.sigmoid(x), y.type_as(x).to(x.device), alpha=None
             ),
             'focal_w1': lambda x, y: focal_loss(
                 torch.sigmoid(x), y.type_as(x).to(x.device), alpha=0.25

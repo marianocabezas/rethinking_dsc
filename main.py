@@ -41,20 +41,22 @@ def parse_inputs():
         help='Option to define the folders for each ask with all the patients.'
     )
     parser.add_argument(
-        '-e', '--epochs',
-        dest='epochs',
+        '-e', '--epochs', dest='epochs',
         type=int, default=50,
         help='Number of epochs'
     )
     parser.add_argument(
-        '-b', '--batch-size',
-        dest='batch_size',
+        '-r', '--ratios', dest='ratios',
+        type=int, nargs='+', default=[0, 1],
+        help='Ratio of negative patches'
+    )
+    parser.add_argument(
+        '-b', '--batch-size', dest='batch_size',
         type=int, default=8,
         help='Number of samples per batch'
     )
     parser.add_argument(
-        '-p', '--patch-size',
-        dest='patch_size',
+        '-p', '--patch-size', dest='patch_size',
         type=int, default=32,
         help='Patch size'
     )
@@ -272,11 +274,11 @@ def main(verbose=2):
     #     'focal_w1', 'focal_w2', 'new'
     # ]
     losses = [
-        'xent', 'gdsc_b', 'dsc', 'mixed', 'focal_w1', 'focal_w2', 'new'
+        'xent', 'xent_w', 'gdsc_b', 'dsc', 'mixed',
+        'focal', 'focal_w1', 'focal_w2', 'new'
     ]
     optim = 'sgd' if options['sgd'] else 'adam'
-    # ratios = [0, 1, 2, 3]
-    ratios = [0, 1]
+    ratios = options['ratios']
     lr = options['lr']
     for d_path in path_list:
         for test_n, seed in enumerate(seeds):
@@ -320,12 +322,14 @@ def main(verbose=2):
                             net.load_model(os.path.join(d_path, model_name))
                         except IOError:
                             # Training
+                            # This weird sampling is mostly here for the
+                            # MSSEG 2016 and WMH 2017 challenges, where we know
+                            # how the different acquisitions are grouped. We
+                            # want all the folds to have at least some images
+                            # from each acquisition to make folds comparable.
+                            # Otherwise the training and validation data, might
+                            # not be the same and it might bias the curves.
                             test = list(range(i, n_patients, n_folds))
-                            # ini_test = n_patients * i // n_folds
-                            # end_test = n_patients * (i + 1) // n_folds
-                            # training = patient_dicts[end_test:] + \
-                            #     patient_dicts[:ini_test]
-                            # testing = patient_dicts[ini_test:end_test]
                             training = [
                                 patient_dicts[t]
                                 for t in range(len(patient_dicts))
@@ -377,16 +381,15 @@ def batch_main(verbose=2):
     # instantiated on the first run and then it's checked if the script end-s.
     # Might do it "later".
     seeds = [42, 80702, 74794, 62021, 48497]
-    # losses = [
-    #     'xent', 'xent_w', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
-    #     'focal_w1', 'focal_w2', 'new'
-    # ]
     losses = [
-        'xent', 'gdsc_b', 'dsc', 'mixed', 'focal_w1', 'focal_w2', 'new'
+        'xent', 'xent_w', 'gdsc', 'gdsc_b', 'dsc', 'mixed', 'focal',
+        'focal_w1', 'focal_w2', 'new'
     ]
+    # losses = [
+    #     'xent', 'gdsc_b', 'dsc', 'mixed', 'focal_w1', 'focal_w2', 'new'
+    # ]
     optim = 'sgd' if options['sgd'] else 'adam'
-    # ratios = [0, 1, 2, 3]
-    ratios = [0, 1]
+    ratios = options['ratios']
     lr = options['lr']
     for test_n, seed in enumerate(seeds):
         for nr in ratios:

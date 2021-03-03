@@ -274,8 +274,8 @@ def main(verbose=2):
     #     'focal_w1', 'focal_w2', 'new'
     # ]
     losses = [
-        'xent', 'xent_w', 'gdsc_b', 'dsc', 'mixed',
-        'focal', 'focal_w1', 'focal_w2', 'new'
+        'xent', 'xent_w', 'gdsc_b', 'dsc', 'mixed', 'focal',
+        'focal_w1', 'focal_w2', 'new'
     ]
     optim = 'sgd' if options['sgd'] else 'adam'
     ratios = options['ratios']

@@ -168,7 +168,7 @@ class WeightedLoss(torch.autograd.Function):
 
         grad_input = grad_output * dsigmoid
 
-        return grad_input, None, None, None
+        return grad_input, None, None, None, None
 
 
 """

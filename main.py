@@ -169,6 +169,7 @@ def train(
     """
     # Init
     c = color_codes()
+
     options = parse_inputs()
     epochs = options['epochs']
     batch_size = options['batch_size']
@@ -252,11 +253,12 @@ def main(verbose=2):
     # Init
     torch.backends.cudnn.deterministic = True
     # torch.backends.cudnn.benchmark = False
-
     n_folds = 5
     c = color_codes()
+
     options = parse_inputs()
     path_list = options['data_dir']
+    patch_size = options['patch_size']
 
     print(
         '{:}[{:}] {:}<Segmentation pipeline>{:}'.format(
@@ -313,6 +315,11 @@ def main(verbose=2):
                         model_name = model_name.format(
                             loss, nr, seed, i, optim, lr
                         )
+                        # model_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}.' \
+                        #              '{:}-lr{:.0e}.ps{:03d}.pt'
+                        # model_name = model_name.format(
+                        #     loss, nr, seed, i, optim, lr, patch_size
+                        # )
                         net = SimpleUNet(
                             n_images=n_images, base_loss=loss,
                             lr=lr, optimiser=optim
@@ -352,13 +359,20 @@ def main(verbose=2):
                                     verbose=verbose
                                 )
 
-        # for nr in ratios:
-        #     for loss in losses:
-        #         analyse_results(
-        #             d_path, 'unet', loss, nr, list(range(n_folds)), lr
-        #         )
-        #         for i in range(n_folds):
-        #             analyse_results(d_path, 'unet', loss, nr, i, lr)
+                            # csv_name = 'unet-{:}.nr{:d}.s{:d}.n{:d}' \
+                            #            '.{:}-lr{:.0e}.ps{:03d}.csv'
+                            #
+                            # with open(
+                            #         os.path.join(d_path, csv_name.format(
+                            #             loss, nr, seed, i, optim, lr, patch_size
+                            #         )), 'w'
+                            # ) as csvfile:
+                            #     csvwriter = csv.writer(csvfile)
+                            #     train(
+                            #         d_path, net, model_name, training, testing,
+                            #         negative_ratio=nr, batch_file=csvwriter,
+                            #         verbose=verbose
+                            #     )
 
 
 def batch_main(verbose=2):
@@ -369,6 +383,7 @@ def batch_main(verbose=2):
     n_folds = 5
     c = color_codes()
     options = parse_inputs()
+    patch_size = options['patch_size']
 
     print(
         '{:}[{:}] {:}<Segmentation pipeline>{:}'.format(
@@ -424,6 +439,11 @@ def batch_main(verbose=2):
                     model_name = model_name.format(
                         loss, nr, seed, i, optim, lr
                     )
+                    # model_name = 'unet-batch-{:}.nr{:d}.s{:d}.n{:d}.' \
+                    #              '{:}-lr{:.0e}.ps{:03d}.pt'
+                    # model_name = model_name.format(
+                    #     loss, nr, seed, i, optim, lr, patch_size
+                    # )
                     net = SimpleUNet(
                         n_images=n_images, base_loss=loss,
                         lr=lr, optimiser=optim
@@ -456,18 +476,24 @@ def batch_main(verbose=2):
                                 verbose=verbose
                             )
 
-    # for nr in ratios:
-    #     for loss in losses:
-    #         analyse_results(
-    #             d_path, 'unet-batch', loss, nr, list(range(n_folds)), lr
-    #         )
-    #         for i in range(n_folds):
-    #             analyse_results(d_path, 'unet-batch', loss, nr, i, lr)
+                        # csv_name = 'unet-batch-{:}.nr{:d}.s{:d}.n{:d}' \
+                        #            '.{:}-lr{:.0e}.ps{:03d}.csv'
+                        #
+                        # with open(
+                        #         os.path.join(d_path, csv_name.format(
+                        #             loss, nr, seed, i, optim, lr, patch_size
+                        #         )), 'w'
+                        # ) as csvfile:
+                        #     csvwriter = csv.writer(csvfile)
+                        #     train(
+                        #         d_path, net, model_name, training, testing,
+                        #         negative_ratio=nr, batch_file=csvwriter,
+                        #         verbose=verbose
+                        #     )
 
 
 if __name__ == '__main__':
-    options = parse_inputs()
-    if options['batched']:
+    if parse_inputs()['batched']:
         batch_main()
     else:
         main()

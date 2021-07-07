@@ -76,8 +76,8 @@ def parse_inputs():
         help='Option to run the main where every batch is used as validation'
     )
     parser.add_argument(
-        '--patched',
-        dest='patched', default=False, action='store_true',
+        '--image',
+        dest='patched', default=True, action='store_false',
         help='Option to use whole images or patches for training'
     )
     options = vars(parser.parse_args())

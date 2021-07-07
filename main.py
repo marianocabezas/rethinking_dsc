@@ -12,7 +12,6 @@ from utils import color_codes, get_dirs, get_int
 from utils import get_mask, get_normalised_image
 from utils import time_to_string, find_file
 from models import SimpleUNet
-from statistics import analyse_results
 from datasets import LesionCroppingDataset, LesionDataset
 
 """
@@ -75,6 +74,11 @@ def parse_inputs():
         '--batched',
         dest='batched', default=False, action='store_true',
         help='Option to run the main where every batch is used as validation'
+    )
+    parser.add_argument(
+        '--patched',
+        dest='patched', default=False, action='store_true',
+        help='Option to use whole images or patches for training'
     )
     options = vars(parser.parse_args())
 
@@ -190,10 +194,13 @@ def train(
     # Training
     if verbose > 1:
         print('< Training dataset >')
-    train_dataset = LesionCroppingDataset(
-        d_train, m_train, r_train, patch_size=patch_size,
-        overlap=overlap, negative_ratio=negative_ratio
-    )
+    if parse_inputs()['patched'] or not parse_inputs()['batched']:
+        train_dataset = LesionCroppingDataset(
+            d_train, m_train, r_train, patch_size=patch_size,
+            overlap=overlap, negative_ratio=negative_ratio
+        )
+    else:
+        train_dataset = LesionDataset(d_train, m_train, r_train)
 
     if verbose > 1:
         print('Dataloader creation <with validation>')
@@ -433,11 +440,11 @@ def batch_main(verbose=2):
                             optim, lr, c['nc']
                         )
                     )
-
+                    suffix_s = 'im-' + loss if parse_inputs()['patched'] else loss
                     model_name = 'unet-batch-{:}.nr{:d}.s{:d}.n{:d}.' \
                                  '{:}-lr{:.0e}.pt'
                     model_name = model_name.format(
-                        loss, nr, seed, i, optim, lr
+                        suffix_s, nr, seed, i, optim, lr
                     )
                     # model_name = 'unet-batch-{:}.nr{:d}.s{:d}.n{:d}.' \
                     #              '{:}-lr{:.0e}.ps{:03d}.pt'
@@ -466,7 +473,7 @@ def batch_main(verbose=2):
 
                         with open(
                                 os.path.join(d_path, csv_name.format(
-                                    loss, nr, seed, i, optim, lr
+                                    suffix_s, nr, seed, i, optim, lr
                                 )), 'w'
                         ) as csvfile:
                             csvwriter = csv.writer(csvfile)

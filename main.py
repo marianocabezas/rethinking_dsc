@@ -440,7 +440,7 @@ def batch_main(verbose=2):
                             optim, lr, c['nc']
                         )
                     )
-                    suffix_s = 'im-' + loss if parse_inputs()['patched'] else loss
+                    suffix_s = loss if parse_inputs()['patched'] else 'im-' + loss
                     model_name = 'unet-batch-{:}.nr{:d}.s{:d}.n{:d}.' \
                                  '{:}-lr{:.0e}.pt'
                     model_name = model_name.format(
